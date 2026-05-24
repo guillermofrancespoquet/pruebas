@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="apple-touch-icon" href="Logo.png">
+<link rel="icon" type="image/png" href="Logo.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="NutriLogos">
+<meta name="application-name" content="NutriLogos">
+<title>Planificación Nutricional Juancho</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, sans-serif; background: #fff; color: #1a1a1a; padding: 1.5rem; max-width: 860px; margin: 0 auto; }
+
+  /* ── PLAN SEMANAL ── */
+  .pn-days { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.25rem; }
+  .pn-day-btn { padding: 6px 14px; font-size: 13px; border: 1px solid #ccc; border-radius: 8px; background: transparent; color: #555; cursor: pointer; transition: background 0.15s; }
+  .pn-day-btn:hover { background: #f4f4f4; }
+  .pn-day-btn.active { background: #f0f0f0; color: #111; border-color: #888; font-weight: 500; }
+  .pn-meals { display: grid; gap: 10px; }
+  .pn-card { background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; padding: 1rem 1.25rem; }
+  .pn-meal-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .pn-badge { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 8px; white-space: nowrap; }
+  .badge-d   { background: #EAF3DE; color: #3B6D11; }
+  .badge-a   { background: #E1F5EE; color: #0F6E56; }
+  .badge-me  { background: #EEEDFE; color: #3C3489; }
+  .badge-c   { background: #FAECE7; color: #993C1D; }
+  .badge-ce  { background: #F3E8FF; color: #6B21A8; }
+  .badge-libre { background: #FBEAF0; color: #993556; }
+  .pn-time { font-size: 12px; color: #aaa; }
+  .pn-name { font-size: 15px; font-weight: 500; color: #111; margin-bottom: 4px; }
+  .pn-desc { font-size: 13px; color: #555; line-height: 1.6; margin-bottom: 8px; }
+  .pn-note { font-size: 12px; color: #888; border-left: 2px solid #ddd; padding-left: 8px; line-height: 1.5; }
+  .pn-extra-tag { display: inline-block; font-size: 11px; font-weight: 500; background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7; border-radius: 6px; padding: 2px 8px; margin-bottom: 6px; }
+  .pn-batch-tag  { display: inline-block; font-size: 11px; font-weight: 500; background: #FFF8E1; color: #795700; border: 1px solid #F0D060; border-radius: 6px; padding: 2px 8px; margin-bottom: 6px; }
+  .pn-sport-banner { border-radius: 8px; padding: 8px 12px; font-size: 12px; margin-bottom: 10px; }
+  .pn-sport-banner.fuerza   { background: #E6F1FB; border: 1px solid #B5D4F4; color: #0C447C; }
+  .pn-sport-banner.run      { background: #EAF3DE; border: 1px solid #C0DD97; color: #27500A; }
+  .pn-sport-banner.crossfit { background: #FAEEDA; border: 1px solid #FAC775; color: #633806; }
+  .pn-sport-banner.rest     { background: #F1EFE8; border: 1px solid #D3D1C7; color: #444441; }
+  .pn-libre-banner { background: #FBEAF0; border: 1px solid #F4C0D1; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #72243E; margin-bottom: 10px; }
+  .pn-supp-banner { background: #F3F0FB; border: 1px solid #C9BFEF; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #3C2E7A; margin-bottom: 10px; line-height: 1.7; }
+  .pn-batch-section { background: #FFFDE7; border: 1px solid #F0D060; border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 10px; }
+  .pn-batch-section h3 { font-size: 13px; font-weight: 600; color: #795700; margin-bottom: 8px; }
+  .pn-batch-section ul { padding-left: 1.1rem; font-size: 13px; color: #555; line-height: 1.85; }
+  .pn-batch-section .bc-note { font-size: 12px; color: #888; margin-top: 10px; border-left: 2px solid #F0D060; padding-left: 8px; }
+  .pn-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #e5e5e5; }
+  .pn-legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #777; }
+  h1 { font-size: 20px; font-weight: 500; margin-bottom: 0.25rem; }
+  .subtitle { font-size: 13px; color: #777; margin-bottom: 1.5rem; }
+  .section-label { font-size: 12px; font-weight: 500; color: #aaa; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.85rem; padding-bottom: 0.4rem; border-bottom: 1px solid #f0f0f0; }
+
+  /* ── PERFIL DEL DEPORTISTA ── */
+  .pn-perfil { margin-bottom: 2rem; }
+  .pn-perfil-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 0.25rem; }
+  .pn-perfil-score { font-size: 12px; font-weight: 500; background: #EAF3DE; color: #3B6D11; border: 1px solid #C0DD97; border-radius: 8px; padding: 2px 10px; }
+  .pn-perfil-sub { font-size: 13px; color: #777; margin-bottom: 1rem; }
+  .pn-perfil-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 10px; }
+  .pn-perfil-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media (max-width: 600px) {
+    .pn-perfil-grid { grid-template-columns: repeat(2, 1fr); }
+    .pn-perfil-grid-2 { grid-template-columns: 1fr; }
+  }
+  .pn-metric { background: #f7f7f7; border-radius: 10px; padding: 0.75rem 1rem; }
+  .pn-metric-lbl { font-size: 11px; color: #999; margin-bottom: 3px; }
+  .pn-metric-val { font-size: 18px; font-weight: 500; color: #111; }
+  .pn-metric-sub { font-size: 11px; color: #bbb; margin-top: 2px; }
+  .pn-impresiones { border: 1px solid #e5e5e5; border-radius: 12px; padding: 1rem 1.25rem; }
+  .pn-impresiones-title { font-size: 12px; font-weight: 500; color: #999; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; }
+  .pn-imp-item { font-size: 13px; color: #444; line-height: 1.65; padding: 0.4rem 0; border-bottom: 1px solid #f0f0f0; display: flex; gap: 8px; align-items: flex-start; }
+  .pn-imp-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .pn-imp-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 7px; }
+  .pn-imp-dot-green { background: #1D9E75; }
+  .pn-imp-dot-blue  { background: #185FA5; }
+  .pn-imp-dot-amber { background: #BA7517; }
+  .pn-imp-dot-coral { background: #993C1D; }
+  .pn-perfil-divider { border: none; border-top: 1px solid #e5e5e5; margin: 1.5rem 0; }
+  .pn-perfil-section-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  @media (max-width: 600px) { .pn-perfil-section-row { grid-template-columns: 1fr; } }
+  .pn-antro-card { background: #f7f7f7; border-radius: 10px; padding: 0.75rem 1rem; }
+  .pn-antro-card-title { font-size: 11px; font-weight: 500; color: #999; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.6rem; }
+  .pn-antro-row { display: flex; justify-content: space-between; font-size: 12px; padding: 3px 0; border-bottom: 1px solid #eee; color: #555; }
+  .pn-antro-row:last-child { border-bottom: none; }
+  .pn-antro-val { font-weight: 500; color: #111; }
+  .pn-bio-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 4px 0; border-bottom: 1px solid #eee; }
+  .pn-bio-row:last-child { border-bottom: none; }
+  .pn-bio-label { color: #777; }
+  .pn-bio-val { font-weight: 500; color: #111; }
+  .pn-bio-badge { font-size: 10px; padding: 1px 7px; border-radius: 6px; font-weight: 500; }
+  .bio-normal { background: #EAF3DE; color: #3B6D11; }
+  .bio-alto   { background: #E6F1FB; color: #185FA5; }
+  .bio-bajo   { background: #FBEAF0; color: #993556; }
+  .pn-soma-card { border: 1px solid #e5e5e5; border-radius: 10px; padding: 0.75rem 1rem; display: flex; align-items: center; }
+  .pn-soma-num { text-align: center; }
+  .pn-soma-num-val { font-size: 22px; font-weight: 500; color: #111; }
+  .pn-soma-num-lbl { font-size: 10px; color: #aaa; margin-top: 2px; }
+  .pn-soma-separator { color: #ddd; font-size: 20px; }
+</style>
+</head>
+<body>
+
+<img src="Logo.png" alt="Guillermo Francés" style="position:fixed;top:14px;right:14px;width:54px;height:54px;object-fit:cover;border-radius:50%;opacity:0.85;z-index:999;">
+
+<h1>Planificación Nutricional — Juancho Sastre Medina</h1>
+<p class="subtitle">Fútbol de competición · Déficit moderado · Base alimentaria flexible · Objetivo: recomposición corporal · Valoración: 24/04/2026</p>
+
+<!-- ═══════════════════════════════════════════════
+     PERFIL DEL DEPORTISTA
+════════════════════════════════════════════════ -->
+<div class="pn-perfil">
+
+  <div class="pn-perfil-header">
+    <span style="font-size:15px;font-weight:500;color:#111">Perfil del deportista</span>
+    <span class="pn-perfil-score">Condición física 86,8 / 100</span>
+  </div>
+  <p class="pn-perfil-sub">Juancho Sastre Medina · 26 años · Hombre · Valorado el 24/04/2026 por Guillermo Francés</p>
+
+  <!-- Métricas principales -->
+  <div class="pn-perfil-grid" style="margin-bottom:10px">
+    <div class="pn-metric">
+      <div class="pn-metric-lbl">Peso actual</div>
+      <div class="pn-metric-val">73,05 kg</div>
+      <div class="pn-metric-sub">IMC 24,13 · Normopeso</div>
+    </div>
+    <div class="pn-metric">
+      <div class="pn-metric-lbl">Talla / envergadura</div>
+      <div class="pn-metric-val">174 / 179 cm</div>
+      <div class="pn-metric-sub">Macrocórmico · E. relativa 1,03</div>
+    </div>
+    <div class="pn-metric">
+      <div class="pn-metric-lbl">% Masa grasa (Yuhasz)</div>
+      <div class="pn-metric-val">7,37 %</div>
+      <div class="pn-metric-sub">5,39 kg · Σ6 pliegues: 38,5 mm</div>
+    </div>
+    <div class="pn-metric">
+      <div class="pn-metric-lbl">% Masa muscular</div>
+      <div class="pn-metric-val">46,52 %</div>
+      <div class="pn-metric-sub">33,98 kg · Z Phantom +2,09</div>
+    </div>
+  </div>
+  <div class="pn-perfil-grid" style="margin-bottom:10px">
+    <div class="pn-metric">
+      <div class="pn-metric-lbl">LBM (masa libre de grasa)</div>
+      <div class="pn-metric-val">63,9 kg</div>
+      <div class="pn-metric-sub">Músculo esquelético: 41,3 kg</div>
+    </div>
+    <div class="pn-metric">
+      <div class="pn-metric-lbl">TMB (bioimpedancia)</div>
+      <div class="pn-metric-val">1.750 kcal</div>
+      <div class="pn-metric-sub">Edad metabólica: 25 años</div>
+    </div>
+    <div class="pn-metric">
+      <div class="pn-metric-lbl">% Tejido adiposo</div>
+      <div class="pn-metric-val">18,08 %</div>
+      <div class="pn-metric-sub">13,21 kg (Ross y Kerr, 1993)</div>
+    </div>
+    <div class="pn-metric">
+      <div class="pn-metric-lbl">Ratio cintura / cadera</div>
+      <div class="pn-metric-val">0,83</div>
+      <div class="pn-metric-sub">Riesgo cardiovascular bajo</div>
+    </div>
+  </div>
+
+  <!-- Somatotipo -->
+  <div style="margin-bottom:10px">
+    <div class="section-label">Somatotipo (Carter-Heath)</div>
+    <div style="display:flex;gap:10px;align-items:stretch;flex-wrap:wrap">
+
+      <!-- Valoración actual -->
+      <div class="pn-soma-card" style="flex:1;min-width:200px;flex-direction:column;gap:10px">
+        <div style="display:flex;justify-content:space-around;align-items:center;width:100%">
+          <div class="pn-soma-num">
+            <div class="pn-soma-num-val">1,69</div>
+            <div class="pn-soma-num-lbl">Endomorfia</div>
+          </div>
+          <div class="pn-soma-separator">—</div>
+          <div class="pn-soma-num">
+            <div class="pn-soma-num-val" style="color:#185FA5">5,06</div>
+            <div class="pn-soma-num-lbl">Mesomorfia</div>
+          </div>
+          <div class="pn-soma-separator">—</div>
+          <div class="pn-soma-num">
+            <div class="pn-soma-num-val">1,89</div>
+            <div class="pn-soma-num-lbl">Ectomorfia</div>
+          </div>
+        </div>
+        <div style="text-align:center;border-top:1px solid #f0f0f0;padding-top:8px;width:100%">
+          <div style="font-size:13px;font-weight:500;color:#185FA5">Mesomorfo</div>
+          <div style="font-size:11px;color:#aaa">Valoración actual</div>
+        </div>
+      </div>
+
+      <!-- Valoración previa -->
+      <div class="pn-metric" style="flex:1;min-width:200px">
+        <div class="pn-metric-lbl">Valoración previa (2-mar-26)</div>
+        <div style="font-size:14px;font-weight:500;color:#555;margin-top:4px">1,63 — 4,77 — 1,91</div>
+        <div class="pn-metric-sub">↑ Mesomorfia +0,29 · Mejora en composición muscular</div>
+      </div>
+
+      <!-- Grupo de referencia ISAK -->
+      <div class="pn-metric" style="flex:1;min-width:200px">
+        <div class="pn-metric-lbl">Grupo de referencia (ISAK)</div>
+        <div style="font-size:14px;font-weight:500;color:#555;margin-top:4px">2,00 — 5,00 — 1,80</div>
+        <div class="pn-metric-sub">Juancho supera la mesomorfia de referencia</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Datos antropométricos y bioimpedancia en columnas -->
+  <div class="pn-perfil-section-row">
+    <div>
+      <div class="section-label">Datos antropométricos clave</div>
+      <div class="pn-antro-card">
+        <div class="pn-antro-card-title">Pliegues cutáneos</div>
+        <div class="pn-antro-row"><span>Tríceps</span><span class="pn-antro-val">8,0 mm</span></div>
+        <div class="pn-antro-row"><span>Subescapular</span><span class="pn-antro-val">6,5 mm</span></div>
+        <div class="pn-antro-row"><span>Bíceps</span><span class="pn-antro-val">2,0 mm</span></div>
+        <div class="pn-antro-row"><span>Cresta ilíaca</span><span class="pn-antro-val">7,5 mm</span></div>
+        <div class="pn-antro-row"><span>Supraespinal</span><span class="pn-antro-val">4,0 mm</span></div>
+        <div class="pn-antro-row"><span>Abdominal</span><span class="pn-antro-val">7,0 mm</span></div>
+        <div class="pn-antro-row"><span>Muslo</span><span class="pn-antro-val">8,0 mm</span></div>
+        <div class="pn-antro-row"><span>Pierna</span><span class="pn-antro-val">5,0 mm</span></div>
+        <div class="pn-antro-row" style="margin-top:4px;padding-top:6px;border-top:1px solid #ddd"><span style="font-weight:500">Σ6 pliegues</span><span class="pn-antro-val" style="color:#185FA5">38,5 mm</span></div>
+        <div class="pn-antro-row"><span style="font-weight:500">Σ8 pliegues</span><span class="pn-antro-val">48,0 mm</span></div>
+      </div>
+      <div class="pn-antro-card" style="margin-top:10px">
+        <div class="pn-antro-card-title">Perímetros</div>
+        <div class="pn-antro-row"><span>Cintura</span><span class="pn-antro-val">78,0 cm</span></div>
+        <div class="pn-antro-row"><span>Cadera</span><span class="pn-antro-val">94,2 cm</span></div>
+        <div class="pn-antro-row"><span>Brazo relajado / contraído</span><span class="pn-antro-val">29,0 / 32,2 cm</span></div>
+        <div class="pn-antro-row"><span>Muslo / pierna</span><span class="pn-antro-val">55,8 / 40,5 cm</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Datos bioimpedancia</div>
+      <div class="pn-antro-card">
+        <div class="pn-antro-card-title">Composición corporal</div>
+        <div class="pn-bio-row"><span class="pn-bio-label">Agua corporal</span><div style="display:flex;gap:6px;align-items:center"><span class="pn-bio-val">46,1 L</span><span class="pn-bio-badge bio-normal">Normal</span></div></div>
+        <div class="pn-bio-row"><span class="pn-bio-label">Proteína</span><div style="display:flex;gap:6px;align-items:center"><span class="pn-bio-val">14,5 kg</span><span class="pn-bio-badge bio-normal">Normal</span></div></div>
+        <div class="pn-bio-row"><span class="pn-bio-label">Masa ósea</span><div style="display:flex;gap:6px;align-items:center"><span class="pn-bio-val">3,19 kg</span><span class="pn-bio-badge bio-normal">Normal</span></div></div>
+        <div class="pn-bio-row"><span class="pn-bio-label">Masa grasa corporal</span><div style="display:flex;gap:6px;align-items:center"><span class="pn-bio-val">9,13 kg</span><span class="pn-bio-badge bio-normal">Normal</span></div></div>
+        <div class="pn-bio-row"><span class="pn-bio-label">% Grasa (PBF)</span><div style="display:flex;gap:6px;align-items:center"><span class="pn-bio-val">12,5 %</span><span class="pn-bio-badge bio-normal">Normal</span></div></div>
+        <div class="pn-bio-row"><span class="pn-bio-label">Músculo esquelético</span><div style="display:flex;gap:6px;align-items:center"><span class="pn-bio-val">41,3 kg</span><span class="pn-bio-badge bio-alto">Alto</span></div></div>
+        <div class="pn-bio-row"><span class="pn-bio-label">Grasa visceral</span><div style="display:flex;gap:6px;align-items:center"><span class="pn-bio-val">Nivel 6</span><span class="pn-bio-badge bio-bajo">Por debajo</span></div></div>
+      </div>
+      <div class="pn-antro-card" style="margin-top:10px">
+        <div class="pn-antro-card-title">Fuerza y equilibrio muscular</div>
+        <div class="pn-bio-row"><span class="pn-bio-label">Fuerza superior</span><div style="display:flex;gap:6px;align-items:center"><span class="pn-bio-badge bio-alto">Desarrollada</span></div></div>
+        <div class="pn-bio-row"><span class="pn-bio-label">Fuerza inferior</span><div style="display:flex;gap:6px;align-items:center"><span class="pn-bio-badge bio-alto">Desarrollada</span></div></div>
+        <div class="pn-bio-row"><span class="pn-bio-label">Equilibrio superior</span><div style="display:flex;gap:6px;align-items:center"><span class="pn-bio-badge bio-normal">Lev. desequilibrado</span></div></div>
+        <div class="pn-bio-row"><span class="pn-bio-label">Equilibrio inferior</span><div style="display:flex;gap:6px;align-items:center"><span class="pn-bio-badge bio-normal">Lev. desequilibrado</span></div></div>
+        <div class="pn-bio-row"><span class="pn-bio-label">IMC</span><div style="display:flex;gap:6px;align-items:center"><span class="pn-bio-val">23,9</span><span class="pn-bio-badge bio-normal">Normal</span></div></div>
+      </div>
+      <div class="pn-antro-card" style="margin-top:10px">
+        <div class="pn-antro-card-title">Control de peso (objetivo)</div>
+        <div class="pn-bio-row"><span class="pn-bio-label">Peso deseado</span><span class="pn-bio-val">75,2 kg</span></div>
+        <div class="pn-bio-row"><span class="pn-bio-label">Control de grasa</span><span class="pn-bio-val">+2,15 kg</span></div>
+        <div class="pn-bio-row"><span class="pn-bio-label">Control muscular</span><span class="pn-bio-val">+0 kg</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Impresiones clínicas -->
+  <div style="margin-top:10px">
+    <div class="section-label">Impresiones del profesional</div>
+    <div class="pn-impresiones">
+      <div class="pn-imp-item">
+        <div class="pn-imp-dot pn-imp-dot-green"></div>
+        <div><strong>Composición corporal excelente para futbolista de competición.</strong> Σ6 de 38,5 mm y 7,37% de grasa (Yuhasz) indican delgadez funcional alta. El 12,5% de la bioimpedancia refleja diferencias metodológicas e hidratación; el referente fiable es la antropometría.</div>
+      </div>
+      <div class="pn-imp-item">
+        <div class="pn-imp-dot pn-imp-dot-green"></div>
+        <div><strong>El mantenimiento de peso (72–73 kg) es una señal correcta, no un fracaso del plan.</strong> Con este Σ6 el organismo está protegiendo la reserva grasa mínima funcional. Bajar más grasa no añadiría rendimiento y podría comprometer potencia y salud ósea.</div>
+      </div>
+      <div class="pn-imp-item">
+        <div class="pn-imp-dot pn-imp-dot-blue"></div>
+        <div><strong>El somatotipo ha mejorado positivamente</strong> de 1,63–4,77–1,91 a 1,69–5,06–1,89: más mesomorfia e idéntica endomorfia. Esto refleja recomposición corporal real con ganancia neta de músculo.</div>
+      </div>
+      <div class="pn-imp-item">
+        <div class="pn-imp-dot pn-imp-dot-amber"></div>
+        <div><strong>Objetivo real del plan: recomposición corporal, no pérdida de peso.</strong> La propia bioimpedancia apunta a +2,15 kg de grasa de control (mantener o subir ligeramente la masa libre de grasa) y 0 kg de pérdida muscular, lo que confirma la estrategia.</div>
+      </div>
+      <div class="pn-imp-item">
+        <div class="pn-imp-dot pn-imp-dot-coral"></div>
+        <div><strong>Últimas dos semanas de competición:</strong> déficit adicional de ~150 kcal aplicado en fuentes grasas (AOVE) y ajuste menor de avena. Sin tocar la carga de hidratos pre-entreno ni la proteína para preservar fuerza y potencia.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<hr class="pn-perfil-divider">
+
+<!-- ═══════════════════════════════════════════════
+     PLANIFICACIÓN SEMANAL
+════════════════════════════════════════════════ -->
+<h1 style="margin-bottom:0.25rem">Plan de comidas semanal</h1>
+<p class="subtitle">Estructura de 4 comidas · Sin ayuno declarado en L–J · Con aviso de ayuno en días de entrenamiento</p>
+
+<div class="pn-days" id="dayTabs"></div>
+<div id="dayView"></div>
+
+<div class="pn-legend">
+  <span style="font-size:12px;color:#aaa;margin-right:4px;">Comidas:</span>
+  <span class="pn-legend-item"><span class="pn-badge badge-d">D</span> Desayuno</span>
+  <span class="pn-legend-item"><span class="pn-badge badge-a">A</span> Almuerzo</span>
+  <span class="pn-legend-item"><span class="pn-badge badge-me">Me</span> Merienda</span>
+  <span class="pn-legend-item"><span class="pn-badge badge-c">C</span> Cena</span>
+</div>
+
+<script>
+const days = [
+  {
+    short: "Lun",
+    full: "Lunes",
+    sport: "⚽ Entrenamiento",
+    sportClass: "fuerza",
+    sportBanner: "Día de entrenamiento — hidratos en comida y merienda, proteína alta en cena. ~2.100 kcal · ~120 g proteína.",
+    suppl: null,
+    meals: [
+      {
+        type: "D", time: "7:00–8:30",
+        name: "Ayuno matutino",
+        tags: [],
+        desc: "Ayuno. Empieza el día con un gran vaso de agua para rehidratarte después de la noche.",
+        note: "Puedes añadir limón al agua si lo prefieres. Si tienes hambre real, una pieza de fruta pequeña está permitida."
+      },
+      {
+        type: "A", time: "10:30–11:00",
+        name: "Tostadas con hummus, pavo y tomate",
+        tags: [],
+        desc: "2 rebanadas de pan integral + 1 cda. generosa de hummus + 2 lonchas de fiambre de pavo + 2 rodajas de tomate + hojas de lechuga.\n1 manzana + 1 puñadito de nueces (≈ 10 g).",
+        note: "Sustituir el pavo por aguacate (¼) si se prefiere opción 100% vegetal. Las nueces aportan omega-3 y saciedad."
+      },
+      {
+        type: "C", time: "13:30–14:30",
+        name: "Pasta al atún con ensalada",
+        tags: [],
+        desc: "80 g de pasta en crudo + 1 lata de atún al natural (80 g escurrido) + 2 cdas. de salsa de tomate casera o tomate triturado.\nEnsalada: tomate + pepino + brotes verdes + puñado pequeño de semillas + aliño con especias + 1 cdita. de AOVE.",
+        note: "Cocer la pasta al dente para bajar el índice glucémico. El atún puede sustituirse por edamame o garbanzos si se quiere versión vegetal."
+      },
+      {
+        type: "Me", time: "17:00–17:30",
+        name: "Batido de soja con avena + tortita de arroz",
+        tags: [],
+        desc: "Opción batido: 250 ml de bebida de soja + 1 plátano + 40 g de copos de avena (≈ 2 cdas.) + 1 tortita de arroz con 1 cdita. de mermelada o miel.\nOpción sólido: 2 rebanadas de pan integral + 1 cda. de mermelada + 1 plátano en láminas.",
+        note: "Esta merienda es el hidrato pre-entrenamiento. No la saltes si entrenas por la tarde. El batido es más rápido y igual de efectivo."
+      },
+      {
+        type: "C", time: "20:30–21:30",
+        name: "Boniato asado con pollo a la plancha",
+        tags: [],
+        desc: "400 g de boniato asado (horno 200°C, 40 min) + 120 g de pechuga de pollo a la plancha + verduras al horno o salteadas al gusto + 1 cda. de AOVE.\nRecuerda cocer un huevo duro para mañana.",
+        note: "El boniato puede cocerse en microondas en 8–10 min pinchado con tenedor. Proteína pre-cama si es necesario."
+      }
+    ],
+    batchCooking: null
+  },
+  {
+    short: "Mar",
+    full: "Martes",
+    sport: "⚽ Entrenamiento",
+    sportClass: "fuerza",
+    sportBanner: "Día de entrenamiento — hidratos en comida, proteína alta. ~2.000 kcal · ~115 g proteína.",
+    suppl: null,
+    meals: [
+      {
+        type: "D", time: "7:00–8:30",
+        name: "Ayuno matutino",
+        tags: [],
+        desc: "Ayuno. Empieza el día con un gran vaso de agua para rehidratarte después de la noche.",
+        note: "Hidratación matutina clave. Si tienes entrenamiento muy temprano, consulta si mover la merienda a antes del entreno."
+      },
+      {
+        type: "A", time: "10:30–11:00",
+        name: "Sándwich de pan integral con aguacate y huevo duro",
+        tags: [],
+        desc: "2 rebanadas de pan integral + ¼ aguacate en láminas + 1 huevo duro (cocido la noche anterior) en láminas.\n1 fruta al gusto.",
+        note: "El huevo hay que tenerlo cocido del día anterior. Si no, sustituir por 1 cda. generosa de hummus."
+      },
+      {
+        type: "C", time: "13:30–14:30",
+        name: "Arroz con ternera magra y brócoli",
+        tags: [],
+        desc: "125 g de arroz cocido + 150 g de carne vacuna magra picada + 150 g de brócoli al vapor + 1 cda. de AOVE.",
+        note: "El brócoli se puede hacer en microondas en 4 min con un poco de agua. Sustituir la ternera por tofu firme salteado si se prefiere opción vegetal."
+      },
+      {
+        type: "Me", time: "17:00–17:30",
+        name: "Tortitas de arroz con mermelada",
+        tags: [],
+        desc: "3 tortitas de arroz con 1 cdita. de mermelada por encima de cada una + 1 plátano.",
+        note: "Hidrato de absorción rápida antes del entrenamiento. Simple y efectivo."
+      },
+      {
+        type: "C", time: "20:30–21:30",
+        name: "Pizza casera",
+        tags: [],
+        desc: "Pizza casera — elegir una de las opciones de recetas:\nOpción A: base de pan pita integral + tomate triturado + mozzarella ligera + verduras al gusto.\nOpción B: masa de coliflor + tomate + proteína al gusto.",
+        note: "Noche de pizza como herramienta de adherencia psicológica. Controla las cantidades pero disfrútala. Ensalada de tomate + pepino + remolacha + aliño AOVE como acompañamiento."
+      }
+    ],
+    batchCooking: null
+  },
+  {
+    short: "Mié",
+    full: "Miércoles",
+    sport: "⚽ Entrenamiento",
+    sportClass: "fuerza",
+    sportBanner: "Día de entrenamiento — hidratos controlados, proteína mantenida. ~1.980 kcal · ~110 g proteína.",
+    suppl: null,
+    meals: [
+      {
+        type: "D", time: "7:00–8:30",
+        name: "Ayuno matutino",
+        tags: [],
+        desc: "Ayuno. Empieza el día con un gran vaso de agua para rehidratarte después de la noche.",
+        note: "Hidratación mínima de 500 ml al levantarte antes de cualquier comida."
+      },
+      {
+        type: "A", time: "10:30–11:00",
+        name: "Tostadas con hummus, pavo y pera o manzana",
+        tags: [],
+        desc: "2 rebanadas de pan integral + 1 cda. de hummus + 2–3 lonchas de pavo + láminas finas de pera o manzana.\n125 g de yogur de soja o griego desgrasado.",
+        note: "La fruta dentro del sándwich da dulzor natural y evita añadir azúcar. El yogur aporta proteína extra sin apenas grasa."
+      },
+      {
+        type: "C", time: "13:30–14:30",
+        name: "Ensalada de quinoa con pollo y patatas",
+        tags: [],
+        desc: "125 g de quinoa cocida + 200 g de patatas cocidas troceadas + 120 g de pechuga de pollo en tiras + verduras al gusto (pepino, tomate, maíz, espinacas).",
+        note: "La quinoa se puede cocer en batch el domingo. El pollo puede ser sobrante de otro día. Aliño: limón + AOVE + especias."
+      },
+      {
+        type: "Me", time: "17:00–17:30",
+        name: "Batido de soja con avena y frutos rojos + tortitas de arroz",
+        tags: [],
+        desc: "Opción batido: 250 ml de bebida de soja + 40 g de avena + 100 g de frutos rojos congelados.\nOpción sólido: 2 rebanadas de pan integral + 1 cda. de hummus + 1 huevo duro en láminas + un puñado pequeño de nueces (≈ 10 g).\n+ 2 tortitas de arroz con hummus y 1 huevo duro en láminas.",
+        note: "Combinar batido + tortitas da mayor volumen de saciedad antes del entrenamiento. Si solo se elige una opción, el batido es más práctico."
+      },
+      {
+        type: "C", time: "20:30–21:30",
+        name: "Arroz con tortilla de atún",
+        tags: [],
+        desc: "125 g de arroz cocido + tortilla de atún (2 huevos + 1 lata de atún al natural).\nEnsalada verde: brotes verdes + pepino + remolacha + ¼ aguacate + 1 cda. de AOVE.\nProteína pre-cama si es necesario.",
+        note: "La tortilla de atún es rápida (5 min). Si prefieres evitar el huevo, sustituir por tofu revuelto (100 g) con la misma lata de atún."
+      }
+    ],
+    batchCooking: null
+  },
+  {
+    short: "Jue",
+    full: "Jueves",
+    sport: "⚽ Entrenamiento",
+    sportClass: "fuerza",
+    sportBanner: "Día de entrenamiento — mayor carga de hidratos en merienda, buena base proteica. ~2.000 kcal · ~120 g proteína.",
+    suppl: null,
+    meals: [
+      {
+        type: "D", time: "7:00–8:30",
+        name: "Ayuno matutino",
+        tags: [],
+        desc: "Ayuno. Empieza el día con un gran vaso de agua para rehidratarte después de la noche.",
+        note: "Si el entrenamiento es mañana y ya tienes partido el fin de semana, prioriza hidratación desde primera hora."
+      },
+      {
+        type: "A", time: "10:30–11:00",
+        name: "Sándwich de pan integral con mantequilla de cacahuete y plátano",
+        tags: [],
+        desc: "2 rebanadas de pan integral + ½ cdita. por capa de mantequilla de cacahuete natural (sin azúcar añadido) + 1 plátano mediano en láminas dentro del sándwich.",
+        note: "Esta combinación grasa + hidrato + potasio es un excelente pre-entreno de media mañana. Asegúrate de que la mantequilla de cacahuete no tenga aceites de palma."
+      },
+      {
+        type: "C", time: "13:30–14:30",
+        name: "Pasta con pollo y verduras",
+        tags: [],
+        desc: "180 g de pasta cocida + 120 g de pollo a la plancha + verduras al gusto (calabacín, pimiento, tomate cherry).",
+        note: "Día de mayor carga de HC por acumulación de entrenamientos. La pasta es el hidrato más eficiente para reponer glucógeno muscular."
+      },
+      {
+        type: "Me", time: "17:00–17:30",
+        name: "Yogur griego con avena, almendras y miel + tortitas de arroz",
+        tags: [],
+        desc: "Opción batido: 250 ml de bebida de soja + 40 g de avena + 1 plátano.\nOpción sólido: 125 g de yogur griego desgrasado + 40 g de avena + un puñado de almendras partidas + 1 cda. de miel.\n+ 2 tortitas de arroz con 1 cda. de mermelada.",
+        note: "El yogur griego en este contexto (post-ayuno de mañana, pre-entrenamiento tardío) está justificado. Priorizar yogur de soja si se quiere reducir grasas saturadas."
+      },
+      {
+        type: "C", time: "20:30–21:30",
+        name: "Patata asada con filete de ternera y ensalada",
+        tags: [],
+        desc: "400 g de patata asada (aprox. 2 patatas medianas) + filete de ternera del tamaño de la palma de la mano.\nEnsalada verde al gusto + aliño con 1 cda. de AOVE, semillas y especias.\nProteína pre-cama si es necesario.",
+        note: "La patata asada es uno de los alimentos más saciantes por kcal. Cocerla o hacerla al horno sin añadir grasas extra. El filete puede sustituirse por salmón o tofu marinado."
+      }
+    ],
+    batchCooking: null
+  },
+  {
+    short: "Pre ⚽",
+    full: "Pre-partido",
+    sport: "⚽ Pre-partido",
+    sportClass: "run",
+    sportBanner: "Día previo al partido — máxima carga de hidratos, proteína mantenida, grasa controlada. ~2.100 kcal · ~110 g proteína.",
+    suppl: null,
+    meals: [
+      {
+        type: "D", time: "7:00–8:30",
+        name: "Ayuno matutino",
+        tags: [],
+        desc: "Ayuno. Empieza el día con un gran vaso de agua para rehidratarte después de la noche.",
+        note: "Hidratación estratégica: apunta a 2–2,5 L de agua a lo largo de todo el día previo al partido."
+      },
+      {
+        type: "A", time: "10:30–11:00",
+        name: "Tostadas con hummus, pavo y fruta",
+        tags: [],
+        desc: "2 rebanadas de pan integral + 1 cda. generosa de hummus + 3–4 lonchas de fiambre de pavo + 2 rodajas de tomate + hojas de lechuga.\n1 puñado de uvas o 1 mandarina o 1 naranja.",
+        note: "La fruta de esta mañana aporta fructosa que repone directamente el glucógeno hepático. Prioriza frutas de fácil digestión."
+      },
+      {
+        type: "C", time: "13:00–14:00",
+        name: "Comida pre-partido (4 h antes)",
+        tags: [],
+        desc: "125 g de quinoa cocida + 200 g de patatas cocidas troceadas + 120 g de salmón a la plancha + un puñado de espárragos trigueros + 1 cda. de AOVE.",
+        note: "Esta comida es la más importante del día. Hidratos de absorción media + proteína de calidad + grasa mínima. Comer con calma y masticar bien. No experimentar con alimentos nuevos."
+      },
+      {
+        type: "Me", time: "17:00–17:30",
+        name: "Tortitas de arroz con mermelada",
+        tags: [],
+        desc: "2 tortitas de arroz + 1 cda. de mermelada.",
+        note: "Snack ligero de hidratos de absorción rápida. Recuerda preparar el desayuno para el día de partido (overnight oats)."
+      },
+      {
+        type: "C", time: "20:30–21:30",
+        name: "Quesadillas con pollo y boniato asado",
+        tags: [],
+        desc: "Quesadillas con pollo (ver receta): tortilla integral + pollo desmenuzado + pimiento + cebolla + queso ligero.\n300 g de boniato asado.\n1 fruta.",
+        note: "Última cena de carga antes del partido. Mantener porciones dentro de lo habitual, no comer en exceso. Recuerda preparar el desayuno de mañana."
+      }
+    ],
+    batchCooking: null
+  },
+  {
+    short: "Partido ★",
+    full: "Día de partido",
+    sport: "⚽ Partido",
+    sportClass: "crossfit",
+    sportBanner: "Día de partido — máximo rendimiento. Desayuno activador, comida pre-partido 4h antes, recuperación post-partido. ~2.300 kcal.",
+    suppl: null,
+    libre: false,
+    meals: [
+      {
+        type: "D", time: "7:30–8:30",
+        name: "Overnight Oats (preparado la noche anterior)",
+        tags: [],
+        desc: "Mezcla en tarro: 60 g de copos de avena + 200 ml de bebida de soja + 1 cdita. de miel + 1 cdita. de semillas de chía + frutos rojos o plátano en láminas.\nDejar en nevera toda la noche. Listo para comer frío.",
+        note: "El overnight oats es el desayuno ideal pre-partido: hidratos lentos + proteína vegetal + sin cocción. Preparar el tarro la noche anterior."
+      },
+      {
+        type: "A", time: "10:30–11:30",
+        name: "Tortitas de avena y plátano",
+        tags: [],
+        desc: "3 tortitas de arroz con hummus + 1 cda. de AOVE.\n1 fruta.",
+        note: "Almuerzo ligero pre-partido. Fácil de digerir, sin exceso de fibra ni grasa. Mantener calma digestiva."
+      },
+      {
+        type: "C", time: "Partido − 4 h",
+        name: "Comida pre-partido (4 h antes del pitido)",
+        tags: [],
+        desc: "180 g de pasta cocida + 120 g de pollo a la plancha + ensalada de pepino y tomate + 1 cda. de AOVE.",
+        note: "Respetar las 4 horas de margen mínimo. No cambiar alimentos ni probar cosas nuevas. Comer despacio."
+      },
+      {
+        type: "Me", time: "Post-partido",
+        name: "Recuperación post-partido",
+        tags: [],
+        desc: "2 vasos de zumo natural o 500 ml de agua con bebida de recuperación (recovery) + 1 plátano.\n2 tortitas de arroz con base fina de mantequilla de cacahuete (1 cda.) y mermelada.\nAlternativa: galletas de avena caseras.",
+        note: "La ventana anabólica de 30–45 min post-partido es crítica. Prioriza hidratos de absorción rápida + algo de proteína. No esperes a llegar a casa para comer."
+      },
+      {
+        type: "C", libre: true, time: "20:30–22:00",
+        name: "Cena libre pero con control",
+        tags: [],
+        desc: "Cena sin restricciones pero con conciencia: prioriza hidratos y proteínas para la recuperación muscular.\nOpciones: pasta con proteína, arroz con salmón, pizza casera, sushi.\nEvitar excesos de alcohol y grasas saturadas.",
+        note: "La cena post-partido es herramienta de adherencia y recuperación al mismo tiempo. Come lo que te apetezca priorizando la recuperación."
+      }
+    ],
+    batchCooking: null
+  },
+  {
+    short: "Des",
+    full: "Descanso",
+    sport: "💤 Descanso",
+    sportClass: "rest",
+    sportBanner: "Día de recuperación — menos hidratos, proteína mantenida, grasa saludable. ~2.050 kcal.",
+    suppl: null,
+    meals: [
+      {
+        type: "D", time: "8:30–9:30",
+        name: "Tortitas de avena y plátano",
+        tags: [],
+        desc: "Tortitas de avena y plátano (ver receta): 60 g de avena + 1 plátano maduro + 1 huevo o sustituto vegetal + canela.\nCocinar en sartén antiadherente con spray de aceite.\nServir con fruta fresca o mermelada sin azúcar.",
+        note: "El descanso es el único día con desayuno completo y tiempo para cocinar. Aprovecha para disfrutar del proceso. Puedes hacer más cantidad y guardar para mañana."
+      },
+      {
+        type: "A", time: "10:30–11:30",
+        name: "Pan integral con aguacate y huevos revueltos",
+        tags: [],
+        desc: "2 rebanadas de pan integral + ¼ de aguacate + 2 huevos revueltos en forma de tostada.",
+        note: "El aguacate aporta grasas saludables y saciedad. Sustituir el huevo por tofu revuelto si se prefiere versión vegetal."
+      },
+      {
+        type: "C", time: "13:30–14:30",
+        name: "Libre pero con control (si es viernes, repetir comida del martes)",
+        tags: [],
+        libre: true,
+        desc: "Comida libre pero consciente. Si es viernes: repetir la comida del martes (arroz con ternera magra y brócoli).\nSi es domingo: comida libre o comida de batch cooking preparada ese día.",
+        note: "En día de descanso los hidratos bajan ligeramente. Prioriza verduras y proteína. Si es domingo, este es el momento de preparar el batch cooking para la semana."
+      },
+      {
+        type: "Me", time: "17:00–17:30",
+        name: "Tortitas de arroz con mantequilla de cacahuete y mermelada",
+        tags: [],
+        desc: "2 tortitas de arroz con base fina de mantequilla de cacahuete (1 cda.) y mermelada.\nAlternativa: galletas de avena caseras.",
+        note: "Snack ligero en día de descanso. Sin necesidad de carga de hidratos importante al no entrenar."
+      },
+      {
+        type: "C", libre: true, time: "20:30–22:00",
+        name: "Cena libre",
+        tags: [],
+        desc: "Cena totalmente libre. Come lo que te apetezca.\nOpcional: crepes de avena rellenos de ricotta y espinacas.\nSi hay entrenamiento al día siguiente, añade 200 g de patata o 125 g de arroz al plato principal.",
+        note: "La cena libre es herramienta de adherencia psicológica. Forma parte del plan. No genera culpa."
+      }
+    ],
+    batchCooking: null
+  }
+];
+
+function badgeClass(type, libre) {
+  if (libre) return "badge-libre";
+  const map = { D:"badge-d", A:"badge-a", Me:"badge-me", C:"badge-c" };
+  return map[type] || "badge-c";
+}
+function badgeLabel(type, libre) {
+  if (libre) return "Libre";
+  const map = { D:"Desayuno", A:"Almuerzo", Me:"Merienda", C:"Cena" };
+  return map[type] || type;
+}
+
+let current = 0;
+
+function render() {
+  const d = days[current];
+  let html = `<div style="font-size:18px;font-weight:500;color:#111;margin-bottom:8px">${d.full}</div>`;
+  html += `<div class="pn-sport-banner ${d.sportClass}">${d.sport} — ${d.sportBanner}</div>`;
+  if (d.libre) {
+    html += `<div class="pn-libre-banner">La cena de este día está reservada como comida libre (10%). El resto del día mantiene la base habitual.</div>`;
+  }
+  if (d.suppl) {
+    html += `<div class="pn-supp-banner">` + d.suppl.replace(/\n/g,"<br>") + `</div>`;
+  }
+  if (d.batchCooking) {
+    const bc = d.batchCooking;
+    const items = bc.items.map(i => `<li>${i}</li>`).join("");
+    html += `<div class="pn-batch-section"><h3>${bc.title}</h3><ul>${items}</ul><div class="bc-note">⏱ ${bc.note}</div></div>`;
+  }
+  html += `<div class="pn-meals">`;
+  d.meals.forEach(m => {
+    const bc = badgeClass(m.type, m.libre);
+    const bl = badgeLabel(m.type, m.libre);
+    const descFormatted = m.desc.replace(/\n/g,"<br>");
+    let tagsHtml = "";
+    if (m.tags && m.tags.includes("extra"))  tagsHtml += `<span class="pn-extra-tag">🥡 Hacer cantidad extra</span> `;
+    if (m.tags && m.tags.includes("batch"))  tagsHtml += `<span class="pn-batch-tag">♻️ Usar del batch cooking</span> `;
+    html += `
+      <div class="pn-card">
+        <div class="pn-meal-header">
+          <span class="pn-badge ${bc}">${bl}</span>
+          <span class="pn-time">${m.time}</span>
+        </div>
+        ${tagsHtml ? `<div style="margin-bottom:6px">${tagsHtml}</div>` : ""}
+        <div class="pn-name">${m.name}</div>
+        <div class="pn-desc">${descFormatted}</div>
+        <div class="pn-note">Adaptación: ${m.note}</div>
+      </div>`;
+  });
+  html += `</div>`;
+  document.getElementById("dayView").innerHTML = html;
+}
+
+function buildTabs() {
+  const container = document.getElementById("dayTabs");
+  days.forEach((d, i) => {
+    const btn = document.createElement("button");
+    btn.className = "pn-day-btn" + (i === 0 ? " active" : "");
+    btn.textContent = d.short;
+    btn.onclick = () => {
+      document.querySelectorAll(".pn-day-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      current = i;
+      render();
+    };
+    container.appendChild(btn);
+  });
+}
+
+buildTabs();
+render();
+</script>
+
+</body>
+</html>
