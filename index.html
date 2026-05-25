@@ -172,27 +172,64 @@
 
   /* ── ESTILOS DE IMPRESIÓN ── */
   @media print {
-    @page { size: A4 landscape; margin: 1cm; }
+    @page {
+      size: A4 landscape;
+      margin: 1.5cm 1.8cm;
+    }
     body * { visibility: hidden; }
     #printArea, #printArea * { visibility: visible; }
     #printArea {
       position: absolute;
-      top: 0; left: 0;
-      width: 100%;
-      padding: 0;
+      top: 0; left: 0; right: 0;
+      display: flex !important;
+      flex-direction: column;
+      justify-content: center;
+      box-sizing: border-box;
     }
-    #printTitle { display: block !important; margin-bottom: 10px; }
-    .pn-tabla { font-size: 9.5px; width: 100%; border-collapse: collapse; }
-    .pn-tabla th, .pn-tabla td { padding: 5px 4px; border: 1px solid #ccc; }
-    .pn-tabla th { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #dce8f5 !important; color: #1a2e44 !important; }
-    .td-d   { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #f9fcf5 !important; }
-    .td-a   { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #f3fdf8 !important; }
-    .td-c   { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #fffaf8 !important; }
-    .td-me  { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #f7f5ff !important; }
-    .td-ce  { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #fdf8ff !important; }
-    .td-libre { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #fbeaf0 !important; color: #72243E !important; }
-    .row-label { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #f7f7f7 !important; font-weight: 600; }
+    #printTitle { display: flex !important; }
     .print-btn { display: none !important; }
+
+    /* Tabla */
+    .pn-tabla {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8.5px;
+      font-family: system-ui, sans-serif;
+      border: 2px solid #1a2e44;
+      border-radius: 0;
+    }
+    .pn-tabla th {
+      -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      background: #0d3d4f !important;
+      color: #ffffff !important;
+      font-size: 8px;
+      font-weight: 700;
+      padding: 7px 5px;
+      text-align: center;
+      border: 1px solid #1a4a5e;
+      letter-spacing: 0.03em;
+    }
+    .pn-tabla td {
+      padding: 6px 5px;
+      border: 1px solid #d0d8e0;
+      vertical-align: top;
+      line-height: 1.4;
+    }
+    .row-label {
+      -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      background: #0d3d4f !important;
+      color: #ffffff !important;
+      font-weight: 700;
+      font-size: 9px;
+      text-align: center;
+      border: 1px solid #1a4a5e;
+    }
+    .td-d   { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #f0f8e8 !important; }
+    .td-a   { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #e8f8f2 !important; }
+    .td-c   { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #fff5f0 !important; }
+    .td-me  { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #f0eeff !important; }
+    .td-ce  { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #f8f0ff !important; }
+    .td-libre { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #fbeaf0 !important; color: #72243E !important; font-style: italic; }
   }
   #printTitle { display: none; }
 </style>
@@ -362,9 +399,15 @@
     <button class="print-btn" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
   </div>
   <div id="printArea">
-  <div id="printTitle" style="margin-bottom:10px;">
-    <div style="font-size:14px;font-weight:600;color:#111;">Menú Semanal — Juancho Sastre Medina</div>
-    <div style="font-size:11px;color:#777;">Guillermo Francés · Nutrition Scientist</div>
+  <div id="printTitle" style="align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid #0d3d4f;">
+    <div>
+      <div style="font-size:13px;font-weight:700;color:#0d3d4f;letter-spacing:0.02em;">Menú Semanal — Juancho Sastre Medina</div>
+      <div style="font-size:9px;color:#888;margin-top:2px;letter-spacing:0.04em;text-transform:uppercase;">Fútbol de competición · Recomposición corporal · Déficit moderado</div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:10px;font-weight:600;color:#0d3d4f;">Guillermo Francés</div>
+      <div style="font-size:8.5px;color:#999;letter-spacing:0.05em;text-transform:uppercase;">Nutrition Scientist</div>
+    </div>
   </div>
   <div style="overflow-x:auto;">
     <table class="pn-tabla">
