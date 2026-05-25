@@ -96,6 +96,34 @@
   .pn-soma-num-val { font-size: 22px; font-weight: 500; color: #111; }
   .pn-soma-num-lbl { font-size: 10px; color: #aaa; margin-top: 2px; }
   .pn-soma-separator { color: #ddd; font-size: 20px; }
+
+  /* ── BOTÓN IMPRIMIR ── */
+  .print-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #0d3d4f;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.02em;
+  }
+  .print-btn:hover { background: #0f4d63; }
+
+  /* ── ESTILOS DE IMPRESIÓN ── */
+  @media print {
+    .print-btn { display: none; }
+    header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .pn-days { display: none; }
+    .pn-day-panel { display: block !important; page-break-inside: avoid; margin-bottom: 1.5rem; }
+    .pn-card { break-inside: avoid; }
+    body { padding: 0; max-width: 100%; }
+  }
 </style>
 </head>
 <body>
@@ -110,6 +138,8 @@
 
 <h1>Planificación Nutricional — Juancho Sastre Medina</h1>
 <p class="subtitle">Fútbol de competición · Déficit moderado · Base alimentaria flexible · Objetivo: recomposición corporal · Valoración: 24/04/2026</p>
+
+<button class="print-btn" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
 
 <!-- ═══════════════════════════════════════════════
      PERFIL DEL DEPORTISTA
