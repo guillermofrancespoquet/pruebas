@@ -172,10 +172,18 @@
 
   /* ── ESTILOS DE IMPRESIÓN ── */
   @media print {
-    body > *:not(#printArea) { display: none !important; }
-    #printArea { display: block !important; padding: 1rem; }
-    .pn-tabla { font-size: 10px; width: 100%; }
-    .pn-tabla th, .pn-tabla td { padding: 5px 4px; }
+    @page { size: A4 landscape; margin: 1cm; }
+    body * { visibility: hidden; }
+    #printArea, #printArea * { visibility: visible; }
+    #printArea {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      padding: 0;
+    }
+    #printTitle { display: block !important; margin-bottom: 10px; }
+    .pn-tabla { font-size: 9.5px; width: 100%; border-collapse: collapse; }
+    .pn-tabla th, .pn-tabla td { padding: 5px 4px; border: 1px solid #ccc; }
     .pn-tabla th { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #dce8f5 !important; color: #1a2e44 !important; }
     .td-d   { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #f9fcf5 !important; }
     .td-a   { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #f3fdf8 !important; }
@@ -183,8 +191,10 @@
     .td-me  { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #f7f5ff !important; }
     .td-ce  { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #fdf8ff !important; }
     .td-libre { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #fbeaf0 !important; color: #72243E !important; }
-    .row-label { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #f7f7f7 !important; }
+    .row-label { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #f7f7f7 !important; font-weight: 600; }
+    .print-btn { display: none !important; }
   }
+  #printTitle { display: none; }
 </style>
 </head>
 <body>
@@ -352,6 +362,10 @@
     <button class="print-btn" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
   </div>
   <div id="printArea">
+  <div id="printTitle" style="margin-bottom:10px;">
+    <div style="font-size:14px;font-weight:600;color:#111;">Menú Semanal — Juancho Sastre Medina</div>
+    <div style="font-size:11px;color:#777;">Guillermo Francés · Nutrition Scientist</div>
+  </div>
   <div style="overflow-x:auto;">
     <table class="pn-tabla">
       <thead>
