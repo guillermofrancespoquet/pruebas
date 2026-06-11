@@ -2,964 +2,782 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Planificación Nutricional Juancho</title>
-<link rel="apple-touch-icon" href="Logo.png">
-<meta name="apple-mobile-web-app-title" content="NutriLogos">
-<meta name="application-name" content="NutriLogos">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Método 3 Meses</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: system-ui, sans-serif; background: #fff; color: #1a1a1a; padding: 1.5rem; max-width: 860px; margin: 0 auto; }
+:root {
+  --teal-900: #04342C;
+  --teal-800: #085041;
+  --teal-600: #0F6E56;
+  --teal-400: #1D9E75;
+  --teal-100: #9FE1CB;
+  --teal-50:  #E1F5EE;
+  --amber-400: #BA7517;
+  --amber-50:  #FAEEDA;
+  --purple-400: #534AB7;
+  --purple-50:  #EEEDFE;
+  --gray-900: #1a1a18;
+  --gray-700: #444441;
+  --gray-500: #5F5E5A;
+  --gray-400: #888780;
+  --gray-200: #D3D1C7;
+  --gray-100: #F1EFE8;
+  --bg: #F7F6F3;
+  --surface: #FFFFFF;
+  --border: rgba(0,0,0,0.09);
+  --border-md: rgba(0,0,0,0.15);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{font-size:16px}
+body{
+  font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  background:var(--bg);
+  color:var(--gray-900);
+  min-height:100vh;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
 
-  /* ── PLAN SEMANAL ── */
-  .pn-days { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.25rem; }
-  .pn-day-btn { padding: 6px 14px; font-size: 13px; border: 1px solid #ccc; border-radius: 8px; background: transparent; color: #555; cursor: pointer; transition: background 0.15s; }
-  .pn-day-btn:hover { background: #f4f4f4; }
-  .pn-day-btn.active { background: #f0f0f0; color: #111; border-color: #888; font-weight: 500; }
-  .pn-meals { display: grid; gap: 10px; }
-  .pn-card { background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; padding: 1rem 1.25rem; }
-  .pn-meal-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-  .pn-badge { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 8px; white-space: nowrap; }
-  .badge-d   { background: #EAF3DE; color: #3B6D11; }
-  .badge-a   { background: #E1F5EE; color: #0F6E56; }
-  .badge-me  { background: #EEEDFE; color: #3C3489; }
-  .badge-c   { background: #FAECE7; color: #993C1D; }
-  .badge-ce  { background: #F3E8FF; color: #6B21A8; }
-  .badge-libre { background: #FBEAF0; color: #993556; }
-  .pn-time { font-size: 12px; color: #aaa; }
-  .pn-name { font-size: 15px; font-weight: 500; color: #111; margin-bottom: 4px; }
-  .pn-note { font-size: 12px; color: #888; border-left: 2px solid #ddd; padding-left: 8px; line-height: 1.5; }
-  .pn-extra-tag { display: inline-block; font-size: 11px; font-weight: 500; background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7; border-radius: 6px; padding: 2px 8px; margin-bottom: 6px; }
-  .pn-batch-tag  { display: inline-block; font-size: 11px; font-weight: 500; background: #FFF8E1; color: #795700; border: 1px solid #F0D060; border-radius: 6px; padding: 2px 8px; margin-bottom: 6px; }
-  .pn-sport-banner { border-radius: 8px; padding: 8px 12px; font-size: 12px; margin-bottom: 10px; }
-  .pn-sport-banner.fuerza   { background: #E6F1FB; border: 1px solid #B5D4F4; color: #0C447C; }
-  .pn-sport-banner.run      { background: #EAF3DE; border: 1px solid #C0DD97; color: #27500A; }
-  .pn-sport-banner.crossfit { background: #FAEEDA; border: 1px solid #FAC775; color: #633806; }
-  .pn-sport-banner.rest     { background: #F1EFE8; border: 1px solid #D3D1C7; color: #444441; }
-  .pn-libre-banner { background: #FBEAF0; border: 1px solid #F4C0D1; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #72243E; margin-bottom: 10px; }
-  .pn-supp-banner { background: #F3F0FB; border: 1px solid #C9BFEF; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #3C2E7A; margin-bottom: 10px; line-height: 1.7; }
-  .pn-batch-section { background: #FFFDE7; border: 1px solid #F0D060; border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 10px; }
-  .pn-batch-section h3 { font-size: 13px; font-weight: 600; color: #795700; margin-bottom: 8px; }
-  .pn-batch-section ul { padding-left: 1.1rem; font-size: 13px; color: #555; line-height: 1.85; }
-  .pn-batch-section .bc-note { font-size: 12px; color: #888; margin-top: 10px; border-left: 2px solid #F0D060; padding-left: 8px; }
-  .pn-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #e5e5e5; }
-  .pn-legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #777; }
-  h1 { font-size: 20px; font-weight: 500; margin-bottom: 0.25rem; }
-  .subtitle { font-size: 13px; color: #777; margin-bottom: 1.5rem; }
+/* VIEWS */
+.view{display:none}
+.view.active{display:block}
 
-  /* ── PERFIL DE LA PERSONA ── */
-  .pn-perfil { margin-bottom: 2rem; }
-  .pn-perfil-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 0.25rem; }
-  .pn-perfil-score { font-size: 12px; font-weight: 500; background: #EAF3DE; color: #3B6D11; border: 1px solid #C0DD97; border-radius: 8px; padding: 2px 10px; }
-  .pn-perfil-sub { font-size: 13px; color: #777; margin-bottom: 1rem; }
-  .pn-perfil-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 10px; }
-  @media (max-width: 600px) { .pn-perfil-grid { grid-template-columns: repeat(2, 1fr); } }
-  .pn-metric { background: #f7f7f7; border-radius: 10px; padding: 0.75rem 1rem; }
-  .pn-metric-lbl { font-size: 11px; color: #999; margin-bottom: 3px; }
-  .pn-metric-val { font-size: 18px; font-weight: 500; color: #111; }
-  .pn-metric-sub { font-size: 11px; color: #bbb; margin-top: 2px; }
-  .pn-impresiones { border: 1px solid #e5e5e5; border-radius: 12px; padding: 1rem 1.25rem; }
-  .pn-imp-item { font-size: 13px; color: #444; line-height: 1.65; padding: 0.4rem 0; border-bottom: 1px solid #f0f0f0; display: flex; gap: 8px; align-items: flex-start; }
-  .pn-imp-item:last-child { border-bottom: none; padding-bottom: 0; }
-  .pn-imp-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 7px; }
-  .pn-imp-dot-green { background: #1D9E75; }
-  .pn-imp-dot-blue  { background: #185FA5; }
-  .pn-imp-dot-amber { background: #BA7517; }
-  .pn-imp-dot-coral { background: #993C1D; }
-  .pn-perfil-divider { border: none; border-top: 1px solid #e5e5e5; margin: 1.5rem 0; }
-  .pn-perfil-section-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-  @media (max-width: 600px) { .pn-perfil-section-row { grid-template-columns: 1fr; } }
-  .pn-antro-card { background: #f7f7f7; border-radius: 10px; padding: 0.75rem 1rem; }
-  .pn-antro-card-title { font-size: 11px; font-weight: 500; color: #999; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.6rem; }
-  .pn-antro-row { display: flex; justify-content: space-between; font-size: 12px; padding: 3px 0; border-bottom: 1px solid #eee; color: #555; }
-  .pn-antro-row:last-child { border-bottom: none; }
-  .pn-antro-val { font-weight: 500; color: #111; }
-  .pn-bio-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 4px 0; border-bottom: 1px solid #eee; }
-  .pn-bio-row:last-child { border-bottom: none; }
-  .pn-bio-label { color: #777; }
-  .pn-bio-val { font-weight: 500; color: #111; }
-  .pn-bio-badge { font-size: 10px; padding: 1px 7px; border-radius: 6px; font-weight: 500; }
-  .bio-normal { background: #EAF3DE; color: #3B6D11; }
-  .bio-alto   { background: #E6F1FB; color: #185FA5; }
-  .bio-bajo   { background: #FBEAF0; color: #993556; }
-  .pn-soma-card { border: 1px solid #e5e5e5; border-radius: 10px; padding: 0.75rem 1rem; display: flex; align-items: center; }
-  .pn-soma-num { text-align: center; }
-  .pn-soma-num-val { font-size: 22px; font-weight: 500; color: #111; }
-  .pn-soma-num-lbl { font-size: 10px; color: #aaa; margin-top: 2px; }
-  .pn-soma-separator { color: #ddd; font-size: 20px; }
-  .section-label { font-size: 12px; font-weight: 500; color: #666; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.85rem; padding-bottom: 0.4rem; border-bottom: 1px solid #e8e8e8; }
+/* ── LOADING ── */
+#view-loading{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;flex-direction:column;gap:12px;
+}
+.spinner{
+  width:32px;height:32px;border:2.5px solid var(--teal-100);
+  border-top-color:var(--teal-400);border-radius:50%;
+  animation:spin 0.8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:13px;color:var(--gray-400)}
 
-  /* ── LISTA DE COMPRA ── */
-  .pn-shop-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem; }
-  .pn-shop-btn { padding: 6px 14px; font-size: 13px; border: 1px solid #ccc; border-radius: 8px; background: transparent; color: #555; cursor: pointer; transition: background 0.15s; }
-  .pn-shop-btn:hover { background: #f4f4f4; }
-  .pn-shop-btn.active { background: #f0f0f0; color: #111; border-color: #888; font-weight: 500; }
-  .pn-shop-btn.active.cat-prot  { background: #E6F1FB; border-color: #B5D4F4; color: #0C447C; }
-  .pn-shop-btn.active.cat-carb  { background: #FAEEDA; border-color: #FAC775; color: #633806; }
-  .pn-shop-btn.active.cat-fat   { background: #EAF3DE; border-color: #C0DD97; color: #27500A; }
-  .pn-shop-btn.active.cat-extra { background: #F1EFE8; border-color: #D3D1C7; color: #444441; }
-  .pn-shop-list { display: grid; gap: 8px; }
-  .pn-shop-item { border: 1px solid #e5e5e5; border-radius: 10px; padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; gap: 12px; cursor: pointer; transition: background 0.15s, opacity 0.15s; }
-  .pn-shop-item.cat-prot  { background: #f5f9fe; }
-  .pn-shop-item.cat-carb  { background: #fefaf5; }
-  .pn-shop-item.cat-fat   { background: #f6fbf2; }
-  .pn-shop-item.cat-extra { background: #f8f8f6; }
-  .pn-shop-item:hover { filter: brightness(0.97); }
-  .pn-shop-item.done { opacity: 0.38; }
-  .pn-shop-item.done .pn-shop-item-name { text-decoration: line-through; color: #aaa; }
-  .pn-shop-item-name { font-size: 13px; font-weight: 500; color: #111; }
-  .pn-shop-item-qty { font-size: 12px; font-weight: 500; color: #555; white-space: nowrap; text-align: right; }
+/* ── TOP NAV ── */
+.top-nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(247,246,243,0.92);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-bottom:0.5px solid var(--border);
+  padding:0 1.25rem;
+  height:52px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.nav-brand{font-size:14px;font-weight:600;color:var(--teal-800);letter-spacing:-0.01em}
+.nav-tabs{display:flex;gap:2px;background:var(--gray-100);border-radius:8px;padding:3px}
+.nav-tab{
+  font-size:12px;padding:5px 12px;border-radius:6px;
+  border:none;background:transparent;color:var(--gray-500);
+  cursor:pointer;font-family:inherit;transition:all 0.15s;font-weight:500;
+}
+.nav-tab.active{background:var(--surface);color:var(--gray-900);box-shadow:0 1px 3px rgba(0,0,0,0.08)}
 
-  /* ── INGREDIENTES ENCAPSULADOS ── */
-  .pn-ing-list { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
-  .pn-ing { display: inline-block; font-size: 12px; background: #f4f4f4; border: 1px solid #e8e8e8; border-radius: 6px; padding: 3px 9px; color: #444; line-height: 1.4; }
+/* ── HERO SEMANA ACTIVA ── */
+.hero{
+  background:var(--teal-900);
+  padding:1.75rem 1.25rem 1.5rem;
+  position:relative;overflow:hidden;
+}
+.hero::after{
+  content:'';position:absolute;
+  right:-30px;bottom:-50px;
+  width:160px;height:160px;border-radius:50%;
+  background:rgba(255,255,255,0.03);
+  pointer-events:none;
+}
+.hero-eyebrow{
+  font-size:11px;font-weight:500;letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--teal-100);opacity:0.7;margin-bottom:6px;
+}
+.hero-week{font-size:28px;font-weight:700;color:#fff;letter-spacing:-0.03em;margin-bottom:4px;line-height:1.1}
+.hero-sub{font-size:14px;color:rgba(255,255,255,0.5);margin-bottom:1.5rem}
 
-  /* ── SUPLEMENTACIÓN ── */
-  .pn-supl-block { background: #F3F0FB; border: 1px solid #C9BFEF; border-radius: 12px; padding: 1rem 1.25rem; }
-  .pn-supl-item { display: flex; gap: 10px; align-items: flex-start; padding: 0.5rem 0; border-bottom: 1px solid #DDD8F5; font-size: 13px; color: #333; line-height: 1.5; }
-  .pn-supl-item:last-child { border-bottom: none; padding-bottom: 0; }
-  .pn-supl-dot { width: 6px; height: 6px; border-radius: 50%; background: #7C5CBF; flex-shrink: 0; margin-top: 6px; }
+/* progress ring */
+.hero-progress{display:flex;align-items:center;gap:14px}
+.ring-wrap{position:relative;width:52px;height:52px;flex-shrink:0}
+.ring-wrap svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:rgba(255,255,255,0.1);stroke-width:4}
+.ring-fill{fill:none;stroke:var(--teal-400);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset 0.6s ease}
+.ring-label{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:600;color:#fff;
+}
+.progress-text{color:rgba(255,255,255,0.65);font-size:13px;line-height:1.4}
+.progress-text strong{color:#fff;display:block;font-size:15px;font-weight:600;margin-bottom:1px}
 
-  /* ── RECETAS ── */
-  .pn-receta { border: 1px solid #e5e5e5; border-radius: 12px; overflow: hidden; margin-bottom: 8px; }
-  .pn-receta-header { display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 1.25rem; cursor: pointer; background: #fafafa; transition: background 0.15s; user-select: none; }
-  .pn-receta-header:hover { background: #f3f3f3; }
-  .pn-receta-title { font-size: 14px; font-weight: 500; color: #111; display: flex; align-items: center; gap: 8px; }
-  .pn-receta-arrow { font-size: 12px; color: #aaa; transition: transform 0.2s; }
-  .pn-receta.open .pn-receta-arrow { transform: rotate(90deg); }
-  .pn-receta-body { display: none; padding: 1rem 1.25rem; border-top: 1px solid #e5e5e5; background: #fff; }
-  .pn-receta.open .pn-receta-body { display: block; }
-  .pn-receta-meta { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1rem; }
-  .pn-receta-meta-pill { font-size: 11px; background: #f4f4f4; border: 1px solid #e8e8e8; border-radius: 6px; padding: 3px 10px; color: #555; }
-  .pn-receta-section { font-size: 11px; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.5rem; margin-top: 0.85rem; }
-  .pn-receta-ings { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 0.5rem; }
-  .pn-receta-ing { font-size: 12px; background: #f4f4f4; border: 1px solid #e8e8e8; border-radius: 6px; padding: 3px 10px; color: #444; }
-  .pn-receta-steps { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-  .pn-receta-step { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: #444; line-height: 1.55; }
-  .pn-receta-step-num { min-width: 22px; height: 22px; border-radius: 50%; background: #f0f0f0; border: 1px solid #e0e0e0; font-size: 11px; font-weight: 600; color: #666; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
-  .pn-receta-tip { font-size: 12px; color: #888; border-left: 2px solid #ddd; padding-left: 8px; margin-top: 0.75rem; line-height: 1.5; }
+/* ── CARDS ── */
+.section{padding:1rem 1.25rem 0}
+.section-label{
+  font-size:11px;font-weight:500;letter-spacing:0.08em;
+  text-transform:uppercase;color:var(--gray-400);margin-bottom:10px;
+}
+.card{
+  background:var(--surface);border-radius:14px;
+  border:0.5px solid var(--border);
+  margin-bottom:10px;overflow:hidden;
+}
 
-  /* ── TABLA RESUMEN SEMANAL ── */
-  .pn-tabla { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-bottom: 1.5rem; }
-  .pn-tabla th { background: #dce8f5; color: #1a2e44; font-weight: 600; padding: 7px 6px; text-align: center; border: 1px solid #c5d8ed; }
-  .pn-tabla td { padding: 6px 7px; border: 1px solid #e5e5e5; vertical-align: top; line-height: 1.45; }
-  .pn-tabla .row-label { font-weight: 600; color: #555; background: #f7f7f7; text-align: center; width: 40px; }
-  .pn-tabla .td-d   { background: #f9fcf5; }
-  .pn-tabla .td-a   { background: #f3fdf8; }
-  .pn-tabla .td-c   { background: #fffaf8; }
-  .pn-tabla .td-me  { background: #f7f5ff; }
-  .pn-tabla .td-ce  { background: #fdf8ff; }
-  .pn-tabla .td-libre { background: #fbeaf0; color: #72243E; font-style: italic; }
+/* RETO CARD */
+.reto-card{background:var(--teal-50);border-color:rgba(29,158,117,0.2)}
+.reto-header{padding:1rem 1.25rem 0.75rem;border-bottom:0.5px solid rgba(29,158,117,0.15)}
+.reto-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--teal-400);color:#fff;
+  font-size:10px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;
+  padding:3px 9px;border-radius:20px;margin-bottom:8px;
+}
+.reto-title{font-size:16px;font-weight:600;color:var(--teal-800);line-height:1.3}
+.reto-body{padding:1rem 1.25rem}
+.reto-text{font-size:14px;color:var(--teal-800);line-height:1.6;opacity:0.85}
 
-  /* ── BOTÓN IMPRIMIR ── */
-  .print-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    background: #0d3d4f;
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    padding: 10px 20px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
-    letter-spacing: 0.02em;
-  }
-  .print-btn:hover { background: #0f4d63; }
+/* PILDORA CARD */
+.pildora-card{}
+.card-header{
+  padding:1rem 1.25rem;
+  display:flex;align-items:flex-start;gap:12px;
+}
+.card-icon{
+  width:36px;height:36px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.card-icon.teal{background:var(--teal-50)}
+.card-icon.amber{background:var(--amber-50)}
+.card-icon.purple{background:var(--purple-50)}
+.card-icon svg{width:18px;height:18px}
+.card-meta{flex:1;min-width:0}
+.card-tag{font-size:10px;font-weight:500;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px}
+.card-title{font-size:15px;font-weight:600;color:var(--gray-900)}
+.card-body{padding:0 1.25rem 1.25rem}
+.card-text{font-size:14px;color:var(--gray-500);line-height:1.65}
 
-  /* ── ESTILOS DE IMPRESIÓN ── */
-  @media print {
-    @page {
-      size: A4 landscape;
-      margin: 1.5cm 1.8cm;
-    }
-    body * { visibility: hidden; }
-    #printArea, #printArea * { visibility: visible; }
-    #printArea {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      display: flex !important;
-      flex-direction: column;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-    #printTitle { display: flex !important; }
-    .print-btn { display: none !important; }
+/* MENU CARD */
+.menu-phase-badge{
+  display:inline-block;font-size:11px;font-weight:500;
+  padding:2px 9px;border-radius:20px;margin-bottom:10px;
+}
+.menu-items{}
+.menu-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 0;border-bottom:0.5px solid var(--border);
+  font-size:14px;color:var(--gray-700);
+}
+.menu-item:last-child{border-bottom:none}
+.menu-dot{width:7px;height:7px;border-radius:50%;background:var(--teal-400);flex-shrink:0}
 
-    /* Tabla */
-    .pn-tabla {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 8.5px;
-      font-family: system-ui, sans-serif;
-      border: 2px solid #1a2e44;
-      border-radius: 0;
-    }
-    .pn-tabla th {
-      -webkit-print-color-adjust: exact; print-color-adjust: exact;
-      background: #0d3d4f !important;
-      color: #ffffff !important;
-      font-size: 8px;
-      font-weight: 700;
-      padding: 7px 5px;
-      text-align: center;
-      border: 1px solid #1a4a5e;
-      letter-spacing: 0.03em;
-    }
-    .pn-tabla td {
-      padding: 6px 5px;
-      border: 1px solid #d0d8e0;
-      vertical-align: top;
-      line-height: 1.4;
-    }
-    .row-label {
-      -webkit-print-color-adjust: exact; print-color-adjust: exact;
-      background: #0d3d4f !important;
-      color: #ffffff !important;
-      font-weight: 700;
-      font-size: 9px;
-      text-align: center;
-      border: 1px solid #1a4a5e;
-    }
-    .td-d   { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #f0f8e8 !important; }
-    .td-a   { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #e8f8f2 !important; }
-    .td-c   { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #fff5f0 !important; }
-    .td-me  { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #f0eeff !important; }
-    .td-ce  { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #f8f0ff !important; }
-    .td-libre { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #fbeaf0 !important; color: #72243E !important; font-style: italic; }
-  }
-  #printTitle { display: none; }
+/* ── SEMANAS VIEW ── */
+.weeks-list{padding:1rem 1.25rem 6rem}
+.phase-block{margin-bottom:1.5rem}
+.phase-label-row{
+  display:flex;align-items:center;gap:8px;
+  padding-bottom:8px;margin-bottom:8px;
+  border-bottom:0.5px solid var(--border);
+}
+.phase-pip{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.phase-name{font-size:12px;font-weight:500;color:var(--gray-500)}
+.phase-range{font-size:11px;color:var(--gray-400);margin-left:auto}
+
+.week-row{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 1rem;
+  background:var(--surface);border-radius:12px;
+  border:0.5px solid var(--border);
+  margin-bottom:8px;cursor:pointer;
+  transition:border-color 0.15s;
+}
+.week-row.locked{opacity:0.38;pointer-events:none}
+.week-row.wactive{border-color:var(--teal-400)}
+.week-row:active{background:var(--gray-100)}
+.wrow-num{
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:600;flex-shrink:0;
+}
+.wrow-num.done{background:var(--teal-400);color:#fff}
+.wrow-num.act{background:var(--teal-50);color:var(--teal-800)}
+.wrow-num.lock{background:var(--gray-100);color:var(--gray-400)}
+.wrow-info{flex:1;min-width:0}
+.wrow-title{font-size:14px;font-weight:500;color:var(--gray-900)}
+.wrow-sub{font-size:12px;color:var(--gray-400);margin-top:1px}
+.wrow-arrow{color:var(--gray-200);flex-shrink:0}
+.wrow-check{color:var(--teal-400);font-size:16px;flex-shrink:0}
+
+/* ── DETALLE SEMANA ── */
+.detail-back{
+  display:flex;align-items:center;gap:6px;
+  font-size:14px;color:var(--teal-600);font-weight:500;
+  padding:1rem 1.25rem 0;cursor:pointer;
+  background:none;border:none;font-family:inherit;
+}
+.detail-hero{
+  padding:1.25rem 1.25rem 1rem;
+  border-bottom:0.5px solid var(--border);
+  background:var(--surface);margin:0.75rem 1.25rem;
+  border-radius:14px;
+}
+.detail-eyebrow{font-size:11px;color:var(--gray-400);font-weight:500;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px}
+.detail-title{font-size:22px;font-weight:700;color:var(--gray-900);letter-spacing:-0.02em;line-height:1.2}
+.detail-section{padding:0 1.25rem;margin-bottom:1rem}
+.detail-section-label{
+  font-size:11px;font-weight:500;letter-spacing:0.08em;
+  text-transform:uppercase;color:var(--gray-400);
+  margin-bottom:8px;padding-bottom:6px;
+  border-bottom:0.5px solid var(--border);
+}
+.detail-text{font-size:14px;color:var(--gray-500);line-height:1.65}
+.detail-reto{
+  background:var(--teal-50);border-radius:12px;
+  padding:1rem 1.25rem;margin:0 1.25rem 1rem;
+}
+.detail-reto-tag{font-size:10px;font-weight:600;color:var(--teal-600);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px}
+.detail-reto-text{font-size:14px;color:var(--teal-800);line-height:1.6;font-weight:500}
+
+.check-list{margin:0 1.25rem 1rem}
+.check-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:11px 0;border-bottom:0.5px solid var(--border);
+  cursor:pointer;
+}
+.check-item:last-child{border-bottom:none}
+.chk-box{
+  width:20px;height:20px;border-radius:6px;
+  border:1.5px solid var(--border-md);flex-shrink:0;margin-top:1px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.15s;
+}
+.chk-box.on{background:var(--teal-400);border-color:var(--teal-400)}
+.chk-box.on::after{
+  content:'';width:10px;height:6px;
+  border-left:2px solid #fff;border-bottom:2px solid #fff;
+  transform:rotate(-45deg) translateY(-1px);
+}
+.chk-label{font-size:14px;color:var(--gray-700);line-height:1.4;flex:1}
+.chk-label.done{text-decoration:line-through;color:var(--gray-400)}
+
+/* ── ADMIN OVERLAY ── */
+.overlay{
+  position:fixed;inset:0;
+  background:rgba(4,52,44,0.93);
+  display:flex;align-items:center;justify-content:center;
+  z-index:200;
+}
+.admin-card{
+  background:var(--surface);border-radius:20px;
+  padding:1.75rem;width:calc(100% - 2.5rem);max-width:320px;
+}
+.admin-logo{
+  width:48px;height:48px;background:var(--teal-50);
+  border-radius:14px;display:flex;align-items:center;justify-content:center;
+  margin:0 auto 1.25rem;
+}
+.admin-title{font-size:18px;font-weight:700;text-align:center;margin-bottom:4px}
+.admin-sub{font-size:13px;color:var(--gray-400);text-align:center;margin-bottom:1.5rem}
+.admin-input{
+  width:100%;padding:12px 14px;
+  border:1px solid var(--border-md);border-radius:10px;
+  font-size:15px;font-family:inherit;outline:none;
+  transition:border-color 0.15s;margin-bottom:10px;
+  background:var(--bg);
+}
+.admin-input:focus{border-color:var(--teal-400)}
+.admin-btn-primary{
+  width:100%;padding:12px;background:var(--teal-400);
+  border:none;border-radius:10px;color:#fff;
+  font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;
+}
+.admin-err{font-size:12px;color:#E24B4A;text-align:center;margin-top:8px;min-height:16px}
+.admin-close{
+  display:block;text-align:center;margin-top:14px;
+  font-size:13px;color:var(--gray-400);cursor:pointer;
+  background:none;border:none;font-family:inherit;width:100%;
+}
+
+/* admin panel bar */
+.admin-panel{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--teal-900);
+  padding:0.875rem 1.25rem;
+  display:flex;align-items:center;gap:10px;
+  z-index:100;border-top:0.5px solid rgba(255,255,255,0.08);
+}
+.admin-sel{
+  flex:1;background:rgba(255,255,255,0.08);
+  border:0.5px solid rgba(255,255,255,0.15);
+  border-radius:8px;color:rgba(255,255,255,0.85);
+  font-size:13px;padding:8px 10px;font-family:inherit;cursor:pointer;
+}
+.admin-unlock{
+  background:var(--teal-400);border:none;border-radius:8px;
+  color:#fff;font-size:13px;font-weight:600;
+  padding:8px 16px;cursor:pointer;font-family:inherit;white-space:nowrap;
+}
+.admin-exit{
+  background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);
+  border-radius:8px;color:rgba(255,255,255,0.6);
+  font-size:12px;padding:8px 12px;cursor:pointer;font-family:inherit;
+}
+
+/* access btn */
+.access-btn{
+  position:fixed;bottom:1.25rem;right:1.25rem;z-index:90;
+  background:var(--surface);border:0.5px solid var(--border-md);
+  border-radius:50%;width:44px;height:44px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+.access-btn svg{width:18px;height:18px;color:var(--gray-400)}
+
+/* spacer for bottom */
+.bottom-space{height:5rem}
 </style>
 </head>
 <body>
 
-<h1>Planificación Nutricional — Juancho Sastre Medina</h1>
-<p class="subtitle">Fútbol de competición · Déficit moderado final de temporada · 5 comidas/día · Objetivo: recomposición corporal</p>
+<!-- LOADING -->
+<div id="view-loading" class="view active">
+  <div class="spinner"></div>
+  <p class="loading-text">Cargando tu programa…</p>
+</div>
 
-<!-- ── DESCRIPCIÓN DEL CLIENTE ── -->
-<div style="border:1px solid #e5e5e5;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem;background:#fafafa;">
-  <div style="font-size:11px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.75rem;">Descripción del cliente</div>
-  <div style="display:flex;flex-wrap:wrap;gap:8px;">
-    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:6px 12px;font-size:12px;color:#333;">
-      <span style="color:#999;font-size:10px;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:2px;">Perfil</span>
-      Hombre · 26 años · 174 cm · 73,05 kg
+<!-- ADMIN OVERLAY -->
+<div class="overlay" id="adminOverlay" style="display:none">
+  <div class="admin-card">
+    <div class="admin-logo">
+      <svg fill="none" stroke="#0F6E56" stroke-width="2" viewBox="0 0 24 24" width="24" height="24">
+        <rect x="3" y="11" width="18" height="11" rx="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
     </div>
-    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:6px 12px;font-size:12px;color:#333;">
-      <span style="color:#999;font-size:10px;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:2px;">Contexto</span>
-      Futbolista de competición (semiprofesional)
-    </div>
-    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:6px 12px;font-size:12px;color:#333;">
-      <span style="color:#999;font-size:10px;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:2px;">Objetivo</span>
-      Recomposición corporal · Déficit moderado en tramo final de temporada
-    </div>
-    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:6px 12px;font-size:12px;color:#333;">
-      <span style="color:#999;font-size:10px;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:2px;">Hábitos</span>
-      No fuma · No bebe · Sueño adecuado · NEAT alto (deporte diario)
-    </div>
-    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:6px 12px;font-size:12px;color:#333;">
-      <span style="color:#999;font-size:10px;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:2px;">Aversiones / exclusiones</span>
-      Sin exclusiones declaradas · Base proteica animal flexible
-    </div>
+    <p class="admin-title">Acceso profesional</p>
+    <p class="admin-sub">Desbloquea semanas tras cada sesión</p>
+    <input type="password" class="admin-input" id="adminPass" placeholder="Contraseña" />
+    <button class="admin-btn-primary" onclick="checkAdmin()">Entrar</button>
+    <p class="admin-err" id="loginErr"></p>
+    <button class="admin-close" onclick="closeAdminOverlay()">Cancelar</button>
   </div>
 </div>
 
-<!-- ── OBJETIVO ── -->
-<div style="background:#EBF3FB;border:1.5px solid #A8C8E8;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.5rem;">
-  <div style="font-size:11px;font-weight:600;color:#1a4a72;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.5rem;">Objetivo</div>
-  <p style="font-size:14px;font-weight:600;color:#0C3358;line-height:1.65;">Mantener la composición corporal óptima actual (Σ6 = 38,5 mm · 7,37% grasa Yuhasz) durante el tramo final de competición, aplicando un déficit calórico moderado de ~150 kcal adicionales sobre el plan anterior (~1.870–1.960 kcal/día en días de entrenamiento). Prioridad absoluta: preservar fuerza, potencia y resistencia. No se plantea pérdida de peso real sino recomposición corporal, manteniendo o mejorando la masa libre de grasa (LBM 63,9 kg · músculo esquelético 41,3 kg).</p>
+<!-- ADMIN PANEL BAR -->
+<div class="admin-panel" id="adminPanel" style="display:none">
+  <select class="admin-sel" id="adminSel"></select>
+  <button class="admin-unlock" onclick="doUnlock()">Desbloquear</button>
+  <button class="admin-exit" onclick="exitAdmin()">Salir</button>
 </div>
 
-<!-- ── PERFIL DE LA PERSONA ── -->
-<div class="pn-perfil">
-  <div class="pn-perfil-header">
-    <span style="font-size:15px;font-weight:500;color:#111">Perfil de la persona</span>
-    <span class="pn-perfil-score">Condición física 86,8 / 100</span>
-  </div>
-  <p class="pn-perfil-sub">Juancho Sastre Medina · 26 años · Hombre · Valorado el 24/04/2026 por Guillermo Francés</p>
-
-  <div class="pn-perfil-grid" style="margin-bottom:10px">
-    <div class="pn-metric"><div class="pn-metric-lbl">Peso actual</div><div class="pn-metric-val">73,05 kg</div><div class="pn-metric-sub">IMC 24,13 · Normopeso</div></div>
-    <div class="pn-metric"><div class="pn-metric-lbl">Talla / envergadura</div><div class="pn-metric-val">174 / 179 cm</div><div class="pn-metric-sub">Macrocórmico · E. relativa 1,03</div></div>
-    <div class="pn-metric"><div class="pn-metric-lbl">% Masa grasa (Yuhasz)</div><div class="pn-metric-val">7,37 %</div><div class="pn-metric-sub">5,39 kg · Σ6 pliegues: 38,5 mm</div></div>
-    <div class="pn-metric"><div class="pn-metric-lbl">% Masa muscular</div><div class="pn-metric-val">46,52 %</div><div class="pn-metric-sub">33,98 kg · Z Phantom +2,09</div></div>
-  </div>
-  <div class="pn-perfil-grid" style="margin-bottom:10px">
-    <div class="pn-metric"><div class="pn-metric-lbl">LBM (masa libre de grasa)</div><div class="pn-metric-val">63,9 kg</div><div class="pn-metric-sub">Músculo esquelético: 41,3 kg</div></div>
-    <div class="pn-metric"><div class="pn-metric-lbl">TMB (bioimpedancia)</div><div class="pn-metric-val">1.750 kcal</div><div class="pn-metric-sub">Edad metabólica: 25 años</div></div>
-    <div class="pn-metric"><div class="pn-metric-lbl">% Tejido adiposo</div><div class="pn-metric-val">18,08 %</div><div class="pn-metric-sub">13,21 kg (Ross y Kerr, 1993)</div></div>
-    <div class="pn-metric"><div class="pn-metric-lbl">Ratio cintura / cadera</div><div class="pn-metric-val">0,83</div><div class="pn-metric-sub">Riesgo cardiovascular bajo</div></div>
-  </div>
-
-  <!-- Somatotipo -->
-  <div style="margin-bottom:10px">
-    <div class="section-label">Somatotipo (Carter-Heath)</div>
-    <div style="display:flex;gap:10px;align-items:stretch;flex-wrap:wrap">
-      <div class="pn-soma-card" style="flex:1;min-width:200px;flex-direction:column;gap:10px">
-        <div style="display:flex;justify-content:space-around;align-items:center;width:100%">
-          <div class="pn-soma-num"><div class="pn-soma-num-val">1,69</div><div class="pn-soma-num-lbl">Endomorfia</div></div>
-          <div class="pn-soma-separator">—</div>
-          <div class="pn-soma-num"><div class="pn-soma-num-val" style="color:#185FA5">5,06</div><div class="pn-soma-num-lbl">Mesomorfia</div></div>
-          <div class="pn-soma-separator">—</div>
-          <div class="pn-soma-num"><div class="pn-soma-num-val">1,89</div><div class="pn-soma-num-lbl">Ectomorfia</div></div>
-        </div>
-        <div style="text-align:center;border-top:1px solid #f0f0f0;padding-top:8px;width:100%">
-          <div style="font-size:13px;font-weight:500;color:#185FA5">Mesomorfo dominante</div>
-          <div style="font-size:11px;color:#aaa">Valoración actual</div>
-        </div>
-      </div>
-      <div class="pn-metric" style="flex:1;min-width:200px">
-        <div class="pn-metric-lbl">Valoración previa (2-mar-26)</div>
-        <div style="font-size:14px;font-weight:500;color:#555;margin-top:4px">1,63 — 4,77 — 1,91</div>
-        <div class="pn-metric-sub">↑ Mesomorfia +0,29 · Recomposición corporal confirmada</div>
-      </div>
-      <div class="pn-metric" style="flex:1;min-width:200px">
-        <div class="pn-metric-lbl">Grupo de referencia (ISAK)</div>
-        <div style="font-size:14px;font-weight:500;color:#555;margin-top:4px">2,00 — 5,00 — 1,80</div>
-        <div class="pn-metric-sub">Juancho supera la mesomorfia del grupo de referencia</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Antropometría + Bioimpedancia -->
-  <div class="pn-perfil-section-row">
-    <div>
-      <div class="section-label">Datos antropométricos clave</div>
-      <div class="pn-antro-card">
-        <div class="pn-antro-card-title">Pliegues cutáneos</div>
-        <div class="pn-antro-row"><span>Tríceps</span><span class="pn-antro-val">8,0 mm</span></div>
-        <div class="pn-antro-row"><span>Subescapular</span><span class="pn-antro-val">6,5 mm</span></div>
-        <div class="pn-antro-row"><span>Bíceps</span><span class="pn-antro-val">2,0 mm</span></div>
-        <div class="pn-antro-row"><span>Cresta ilíaca</span><span class="pn-antro-val">7,5 mm</span></div>
-        <div class="pn-antro-row"><span>Supraespinal</span><span class="pn-antro-val">4,0 mm</span></div>
-        <div class="pn-antro-row"><span>Abdominal</span><span class="pn-antro-val">7,0 mm</span></div>
-        <div class="pn-antro-row"><span>Muslo</span><span class="pn-antro-val">8,0 mm</span></div>
-        <div class="pn-antro-row"><span>Pierna</span><span class="pn-antro-val">5,0 mm</span></div>
-        <div class="pn-antro-row" style="margin-top:4px;padding-top:6px;border-top:1px solid #ddd"><span style="font-weight:500">Σ6 pliegues</span><span class="pn-antro-val" style="color:#185FA5">38,5 mm</span></div>
-        <div class="pn-antro-row"><span style="font-weight:500">Σ8 pliegues</span><span class="pn-antro-val">48,0 mm</span></div>
-      </div>
-      <div class="pn-antro-card" style="margin-top:10px">
-        <div class="pn-antro-card-title">Perímetros</div>
-        <div class="pn-antro-row"><span>Cintura</span><span class="pn-antro-val">78,0 cm</span></div>
-        <div class="pn-antro-row"><span>Cadera</span><span class="pn-antro-val">94,2 cm</span></div>
-        <div class="pn-antro-row"><span>Brazo relajado / contraído</span><span class="pn-antro-val">29,0 / 32,2 cm</span></div>
-        <div class="pn-antro-row"><span>Muslo / pierna</span><span class="pn-antro-val">55,8 / 40,5 cm</span></div>
-      </div>
-    </div>
-    <div>
-      <div class="section-label">Datos bioimpedancia</div>
-      <div class="pn-antro-card">
-        <div class="pn-antro-card-title">Composición corporal</div>
-        <div class="pn-bio-row"><span class="pn-bio-label">Agua corporal</span><div style="display:flex;gap:6px;align-items:center"><span class="pn-bio-val">46,1 L</span><span class="pn-bio-badge bio-normal">Normal</span></div></div>
-        <div class="pn-bio-row"><span class="pn-bio-label">Proteína</span><div style="display:flex;gap:6px;align-items:center"><span class="pn-bio-val">14,5 kg</span><span class="pn-bio-badge bio-normal">Normal</span></div></div>
-        <div class="pn-bio-row"><span class="pn-bio-label">Masa ósea</span><div style="display:flex;gap:6px;align-items:center"><span class="pn-bio-val">3,19 kg</span><span class="pn-bio-badge bio-normal">Normal</span></div></div>
-        <div class="pn-bio-row"><span class="pn-bio-label">Masa grasa corporal</span><div style="display:flex;gap:6px;align-items:center"><span class="pn-bio-val">9,13 kg</span><span class="pn-bio-badge bio-normal">Normal</span></div></div>
-        <div class="pn-bio-row"><span class="pn-bio-label">% Grasa (PBF)</span><div style="display:flex;gap:6px;align-items:center"><span class="pn-bio-val">12,5 %</span><span class="pn-bio-badge bio-normal">Normal</span></div></div>
-        <div class="pn-bio-row"><span class="pn-bio-label">Músculo esquelético</span><div style="display:flex;gap:6px;align-items:center"><span class="pn-bio-val">41,3 kg</span><span class="pn-bio-badge bio-alto">Alto</span></div></div>
-        <div class="pn-bio-row"><span class="pn-bio-label">Grasa visceral</span><div style="display:flex;gap:6px;align-items:center"><span class="pn-bio-val">Nivel 6</span><span class="pn-bio-badge bio-bajo">Por debajo</span></div></div>
-      </div>
-      <div class="pn-antro-card" style="margin-top:10px">
-        <div class="pn-antro-card-title">Fuerza y equilibrio muscular</div>
-        <div class="pn-bio-row"><span class="pn-bio-label">Fuerza superior</span><span class="pn-bio-badge bio-alto">Desarrollada</span></div>
-        <div class="pn-bio-row"><span class="pn-bio-label">Fuerza inferior</span><span class="pn-bio-badge bio-alto">Desarrollada</span></div>
-        <div class="pn-bio-row"><span class="pn-bio-label">Equilibrio superior</span><span class="pn-bio-badge bio-normal">Lev. desequilibrado</span></div>
-        <div class="pn-bio-row"><span class="pn-bio-label">Equilibrio inferior</span><span class="pn-bio-badge bio-normal">Lev. desequilibrado</span></div>
-        <div class="pn-bio-row"><span class="pn-bio-label">IMC</span><div style="display:flex;gap:6px;align-items:center"><span class="pn-bio-val">23,9</span><span class="pn-bio-badge bio-normal">Normal</span></div></div>
-      </div>
-      <div class="pn-antro-card" style="margin-top:10px">
-        <div class="pn-antro-card-title">Control de peso (objetivo)</div>
-        <div class="pn-bio-row"><span class="pn-bio-label">Peso deseado</span><span class="pn-bio-val">75,2 kg</span></div>
-        <div class="pn-bio-row"><span class="pn-bio-label">Control de grasa</span><span class="pn-bio-val">+2,15 kg</span></div>
-        <div class="pn-bio-row"><span class="pn-bio-label">Control muscular</span><span class="pn-bio-val">+0 kg</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Impresiones del profesional -->
-  <div style="margin-top:10px">
-    <div class="section-label">Impresiones del profesional</div>
-    <div class="pn-impresiones">
-      <div class="pn-imp-item"><div class="pn-imp-dot pn-imp-dot-green"></div><div><strong>Composición corporal excelente para futbolista de competición.</strong> Σ6 de 38,5 mm y 7,37% de grasa (Yuhasz) indican delgadez funcional alta. El 12,5% de la bioimpedancia refleja diferencias metodológicas e hidratación; el referente fiable es la antropometría.</div></div>
-      <div class="pn-imp-item"><div class="pn-imp-dot pn-imp-dot-green"></div><div><strong>El mantenimiento de peso (72–73 kg) es una señal correcta, no un fracaso del plan.</strong> Con este Σ6 el organismo está protegiendo la reserva grasa mínima funcional. Bajar más grasa no añadiría rendimiento y podría comprometer potencia y salud ósea.</div></div>
-      <div class="pn-imp-item"><div class="pn-imp-dot pn-imp-dot-blue"></div><div><strong>El somatotipo ha mejorado positivamente</strong> de 1,63–4,77–1,91 a 1,69–5,06–1,89: más mesomorfia e idéntica endomorfia. Esto refleja recomposición corporal real con ganancia neta de músculo.</div></div>
-      <div class="pn-imp-item"><div class="pn-imp-dot pn-imp-dot-amber"></div><div><strong>Objetivo real del plan: recomposición corporal, no pérdida de peso.</strong> La propia bioimpedancia apunta a +2,15 kg de grasa de control (mantener o subir la masa libre de grasa) y 0 kg de pérdida muscular, lo que confirma la estrategia.</div></div>
-      <div class="pn-imp-item"><div class="pn-imp-dot pn-imp-dot-coral"></div><div><strong>Últimas semanas de competición — déficit adicional de ~150 kcal.</strong> Aplicado en fuentes grasas (AOVE) y ajuste menor de avena. Sin tocar la carga de hidratos pre-entreno ni la proteína para preservar fuerza y potencia.</div></div>
-    </div>
-  </div>
+<!-- ACCESS BUTTON -->
+<div class="access-btn" id="accessBtn" onclick="showAdminOverlay()" role="button" aria-label="Acceso profesional">
+  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <circle cx="12" cy="8" r="4"/><path d="M6 20v-1a6 6 0 0 1 12 0v1"/>
+  </svg>
 </div>
 
-<hr class="pn-perfil-divider">
+<!-- MAIN APP -->
+<div id="app" style="display:none">
 
-<!-- ── TABLA RESUMEN SEMANAL ── -->
-<div style="margin-bottom:1.5rem;">
-  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:0.85rem;">
-    <div class="section-label" style="margin-bottom:0;">Resumen semanal — vista de un vistazo</div>
-    <button class="print-btn" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
-  </div>
-  <div id="printArea">
-  <div id="printTitle" style="align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid #0d3d4f;">
-    <div>
-      <div style="font-size:13px;font-weight:700;color:#0d3d4f;letter-spacing:0.02em;">Menú Semanal — Juancho Sastre Medina</div>
-      <div style="font-size:9px;color:#888;margin-top:2px;letter-spacing:0.04em;text-transform:uppercase;">Fútbol de competición · Recomposición corporal · Déficit moderado</div>
-    </div>
-    <div style="text-align:right;">
-      <div style="font-size:10px;font-weight:600;color:#0d3d4f;">Guillermo Francés</div>
-      <div style="font-size:8.5px;color:#999;letter-spacing:0.05em;text-transform:uppercase;">Nutrition Scientist</div>
-    </div>
-  </div>
-  <div style="overflow-x:auto;">
-    <table class="pn-tabla">
-      <thead>
-        <tr>
-          <th style="width:38px;"></th>
-          <th>Lunes</th><th>Martes</th><th>Miércoles</th><th>Jueves</th><th>Pre-partido</th><th>Partido</th><th>Descanso</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="row-label pn-tabla td-d">D</td>
-          <td class="td-d">Ayuno · agua al levantarse</td>
-          <td class="td-d">Ayuno · agua al levantarse</td>
-          <td class="td-d">Ayuno · agua al levantarse</td>
-          <td class="td-d">Ayuno · agua al levantarse</td>
-          <td class="td-d">Ayuno · agua al levantarse</td>
-          <td class="td-d">Porridge de Avena (receta)</td>
-          <td class="td-d">Tortitas de Avena y Plátano (receta)</td>
-        </tr>
-        <tr>
-          <td class="row-label pn-tabla td-a">A</td>
-          <td class="td-a">Tostadas hummus + pavo + tomate + fruta + nueces</td>
-          <td class="td-a">Sándwich aguacate + tomate + tortilla francesa</td>
-          <td class="td-a">Tostadas hummus + pavo + pera/manzana + yogur griego</td>
-          <td class="td-a">Sándwich mantequilla cacahuete + plátano</td>
-          <td class="td-a">Tostadas hummus + pavo + tomate + uvas/mandarina</td>
-          <td class="td-a">3 tortitas arroz + mermelada + plátano</td>
-          <td class="td-a">Pan + aguacate + 2 huevos revueltos</td>
-        </tr>
-        <tr>
-          <td class="row-label pn-tabla td-c">C</td>
-          <td class="td-c">Pasta + atún + salsa tomate + ensalada semillas</td>
-          <td class="td-c">Arroz integral + ternera magra + brócoli vapor</td>
-          <td class="td-c">Ensalada quinoa + patatas + pollo en tiras</td>
-          <td class="td-c">Pasta + pollo plancha + verduras</td>
-          <td class="td-c">PRE-PARTIDO 4h: pasta + pollo + ensalada + AOVE</td>
-          <td class="td-libre">Libre pero con control</td>
-          <td class="td-libre">Libre pero con control</td>
-        </tr>
-        <tr>
-          <td class="row-label pn-tabla td-me">Me</td>
-          <td class="td-me">Pan integral + mermelada + plátano</td>
-          <td class="td-me">2 tortitas arroz + mermelada + plátano</td>
-          <td class="td-me">Pan integral + mermelada + plátano</td>
-          <td class="td-me">Batido soja + avena + frutos rojos + tortitas hummus</td>
-          <td class="td-me">Yogur griego + avena + miel + tortita mermelada</td>
-          <td class="td-me">POST-PARTIDO: zumo/recovery + plátano + tortitas</td>
-          <td class="td-me">Tortitas arroz + mantequilla cacahuete + mermelada</td>
-        </tr>
-        <tr>
-          <td class="row-label pn-tabla td-ce">Ce</td>
-          <td class="td-ce">Boniato 300 g + pollo plancha + verduras</td>
-          <td class="td-ce">Curry de Garbanzos + ensalada tomate/pepino/remolacha</td>
-          <td class="td-ce">Arroz integral + tortilla atún + ensalada verde</td>
-          <td class="td-ce">Patata asada + filete ternera + ensalada</td>
-          <td class="td-ce">Quesadillas con pollo + boniato 300 g + fruta</td>
-          <td class="td-libre">Libre pero con control</td>
-          <td class="td-libre">Libre · opcional crepes avena ricotta</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  </div>
-</div>
+  <!-- ══ INICIO VIEW ══ -->
+  <div id="view-inicio" class="view active">
+    <nav class="top-nav">
+      <span class="nav-brand">Método 3M</span>
+      <div class="nav-tabs">
+        <button class="nav-tab active" onclick="switchTab('inicio')">Inicio</button>
+        <button class="nav-tab" onclick="switchTab('semanas')">Semanas</button>
+      </div>
+    </nav>
 
-<!-- ── MENÚ DESARROLLADO POR DÍAS ── -->
-<div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid #e5e5e5;">
-  <div class="section-label">Menú desarrollado por días</div>
-  <div class="pn-days" id="dayTabs"></div>
-  <div id="dayView"></div>
-  <div class="pn-legend">
-    <span style="font-size:12px;color:#aaa;margin-right:4px;">Comidas:</span>
-    <span class="pn-legend-item"><span class="pn-badge badge-d">D</span> Desayuno</span>
-    <span class="pn-legend-item"><span class="pn-badge badge-a">A</span> Almuerzo</span>
-    <span class="pn-legend-item"><span class="pn-badge badge-me">Me</span> Merienda</span>
-    <span class="pn-legend-item"><span class="pn-badge badge-c">C</span> Comida</span>
-    <span class="pn-legend-item"><span class="pn-badge badge-ce">Ce</span> Cena</span>
+    <!-- Hero -->
+    <div class="hero" id="heroBlock"></div>
+
+    <!-- Reto activo -->
+    <div class="section" style="margin-top:1.25rem" id="retoSection"></div>
+
+    <!-- Píldora -->
+    <div class="section" id="pildoraSection"></div>
+
+    <!-- Menú de fase -->
+    <div class="section" id="menuSection"></div>
+
+    <div class="bottom-space"></div>
   </div>
-</div>
 
-<!-- ── LISTA DE COMPRA ── -->
-<div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid #e5e5e5;">
-  <div class="section-label">Lista de compra semanal</div>
-  <div class="pn-shop-tabs" id="shopTabs"></div>
-  <div id="shopView"></div>
-</div>
-
-<!-- ── SUPLEMENTACIÓN ── -->
-<div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid #e5e5e5;">
-  <div class="section-label">Suplementación recomendada</div>
-  <div class="pn-supl-block">
-    <div class="pn-supl-item"><div class="pn-supl-dot"></div><div><strong>Creatina monohidrato</strong> — 5 g diarios por la mañana disueltos en agua, batido o bebida de soja. Tomar todos los días independientemente del entrenamiento.</div></div>
-    <div class="pn-supl-item"><div class="pn-supl-dot"></div><div><strong>Bebida isotónica</strong> — Intra-entreno en sesiones de más de 60 min o en días de partido. Repone electrolitos y carbohidratos de absorción rápida durante el esfuerzo.</div></div>
-    <div class="pn-supl-item"><div class="pn-supl-dot"></div><div><strong>Proteína en polvo</strong> — Opcional. Solo en días donde la ingesta proteica real quede por debajo del objetivo (~115–125 g). Máximo 1–2 tomas/semana. No es un sustituto de las fuentes alimentarias.</div></div>
+  <!-- ══ SEMANAS VIEW ══ -->
+  <div id="view-semanas" class="view">
+    <nav class="top-nav">
+      <span class="nav-brand">Método 3M</span>
+      <div class="nav-tabs">
+        <button class="nav-tab" onclick="switchTab('inicio')">Inicio</button>
+        <button class="nav-tab active" onclick="switchTab('semanas')">Semanas</button>
+      </div>
+    </nav>
+    <div class="weeks-list" id="weeksList"></div>
   </div>
-</div>
 
-<!-- ── RECETAS ── -->
-<div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid #e5e5e5;">
-  <div class="section-label">Recetas</div>
-  <div id="recetasList"></div>
-</div>
-
-<!-- ── PRÓXIMA REVISIÓN ── -->
-<div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid #e5e5e5;">
-  <div class="section-label">Próxima revisión</div>
-  <div style="display:flex;align-items:center;gap:14px;background:#fafafa;border:1px solid #e5e5e5;border-radius:12px;padding:1rem 1.25rem;">
-    <div style="font-size:28px;">📅</div>
-    <div>
-      <div style="font-size:16px;font-weight:500;color:#111;">Pausada — inicio de próxima temporada</div>
-      <div style="font-size:12px;color:#999;margin-top:3px;">Retomar con valoración antropométrica + bioimpedancia · Revisión de composición corporal tras pretemporada · Ajuste de plan según nuevo objetivo</div>
-    </div>
+  <!-- ══ DETALLE VIEW ══ -->
+  <div id="view-detalle" class="view">
+    <nav class="top-nav">
+      <span class="nav-brand">Método 3M</span>
+      <div class="nav-tabs">
+        <button class="nav-tab" onclick="switchTab('inicio')">Inicio</button>
+        <button class="nav-tab" onclick="switchTab('semanas')">Semanas</button>
+      </div>
+    </nav>
+    <button class="detail-back" onclick="switchTab('semanas')">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Todas las semanas
+    </button>
+    <div id="detalleContent"></div>
+    <div class="bottom-space"></div>
   </div>
+
 </div>
 
 <script>
-const days = [
-  {
-    short: "Lun", full: "Lunes",
-    sport: "⚽ Entrenamiento", sportClass: "fuerza",
-    sportBanner: "Entrenamiento de fuerza + técnica — carga de hidratos en comida y merienda, proteína alta en cena. ~1.960 kcal · ~120 g proteína.",
-    suppl: null, libre: false,
-    meals: [
-      { type:"D", time:"7:00–8:30", name:"Ayuno matutino",
-        tags:[], desc:"Ayuno. Empieza el día con un gran vaso de agua fría para rehidratarte después de la noche.",
-        note:"Puedes añadir limón al agua. Si tienes hambre real antes del almuerzo, una pieza de fruta pequeña está permitida." },
-      { type:"A", time:"10:30–11:00", name:"Tostadas con hummus, pavo y tomate",
-        tags:[], desc:"2 rebanadas de pan integral\n1 cda. generosa de hummus\n2 lonchas de fiambre de pavo\n2 rodajas de tomate\nHojas de lechuga\n1 fruta\n1 puñadito de nueces (≈10 g)",
-        note:"Sustituir el pavo por aguacate (1/4) si se prefiere opción más vegetal. Las nueces aportan omega-3 y saciedad." },
-      { type:"C", time:"13:30–14:30", name:"Pasta con atún y ensalada de semillas",
-        tags:[], desc:"80 g de pasta en crudo\n1 lata de atún al natural (80 g escurrido)\n2 cdas. de salsa de tomate casera o tomate triturado\nEnsalada: tomate + pepino + brotes verdes + semillas\nAliño: especias + 1 cdita. de AOVE",
-        note:"Cocer la pasta al dente para reducir el índice glucémico. El atún puede sustituirse por garbanzos de bote para versión vegetal." },
-      { type:"Me", time:"17:00–17:30", name:"Pan integral con mermelada y plátano",
-        tags:[], desc:"2 rebanadas de pan integral\n2 cdas. de mermelada\n1 plátano en láminas",
-        note:"Hidrato de pre-entrenamiento. Simple y efectivo. No saltar esta merienda si el entrenamiento es por la tarde." },
-      { type:"Ce", time:"20:30–21:30", name:"Boniato asado con pollo a la plancha",
-        tags:[], desc:"300 g de boniato asado (horno 200°C, 35 min o microondas 8 min)\n120 g de pechuga de pollo a la plancha\nVerduras al horno o salteadas al gusto\nProteína pre-cama (opcional)",
-        note:"El boniato en microondas: pinchar con tenedor, 8 min a potencia máxima. Proteína pre-cama si el objetivo diario no está cubierto." }
-    ], batchCooking: null
-  },
-  {
-    short: "Mar", full: "Martes",
-    sport: "⚽ Entrenamiento", sportClass: "fuerza",
-    sportBanner: "Entrenamiento de fuerza + táctica — hidratos en comida, proteína alta. ~1.960 kcal · ~115 g proteína.",
-    suppl: null, libre: false,
-    meals: [
-      { type:"D", time:"7:00–8:30", name:"Ayuno matutino",
-        tags:[], desc:"Ayuno. Empieza el día con un gran vaso de agua para rehidratarte después de la noche.",
-        note:"Hidratación matutina clave. Si el entrenamiento es muy temprano, consultar con el nutricionista si mover la merienda." },
-      { type:"A", time:"10:30–11:00", name:"Sándwich de aguacate, tomate y tortilla francesa",
-        tags:[], desc:"2 rebanadas de pan integral\n½ aguacate en láminas\nRodajas de tomate\nTortilla francesa de 1 huevo\n1 fruta",
-        note:"El huevo en tortilla francesa aporta proteína de alta calidad. Sustituir por 2 cdas. de hummus si se prefiere sin huevo." },
-      { type:"C", time:"13:30–14:30", name:"Arroz integral con ternera magra y brócoli",
-        tags:[], desc:"125 g de arroz integral cocido (vasito precocido)\n120 g de carne vacuna magra picada\n150 g de brócoli al vapor\n1 cda. de AOVE",
-        note:"El brócoli al vapor en microondas: 4 min con un poco de agua en recipiente tapado. Sustituir la ternera por tofu firme salteado si se prefiere vegetal." },
-      { type:"Me", time:"17:00–17:30", name:"Tortitas de arroz con mermelada y plátano",
-        tags:[], desc:"2 tortitas de arroz\n1 cdita. de mermelada por encima de cada una\n1 plátano en láminas",
-        note:"Hidrato de absorción rápida antes del entrenamiento. Rápido y portátil." },
-      { type:"Ce", time:"20:30–21:30", name:"Curry de Garbanzos con ensalada",
-        tags:[], desc:"Curry de Garbanzos (ver recetas)\nEnsalada: tomate + pepino + remolacha\nAliño: especias y AOVE",
-        note:"Hacer el doble de curry para tener sobrantes. Aguanta 3 días en nevera. Plato con alta densidad de fibra y proteína vegetal." }
-    ], batchCooking: null
-  },
-  {
-    short: "Mié", full: "Miércoles",
-    sport: "⚽ Entrenamiento", sportClass: "fuerza",
-    sportBanner: "Entrenamiento técnico + físico — hidratos controlados, proteína mantenida. ~1.940 kcal · ~115 g proteína.",
-    suppl: null, libre: false,
-    meals: [
-      { type:"D", time:"7:00–8:30", name:"Ayuno matutino",
-        tags:[], desc:"Ayuno. Empieza el día con un gran vaso de agua para rehidratarte después de la noche.",
-        note:"Mínimo 500 ml de agua al levantarte antes de cualquier otra ingesta." },
-      { type:"A", time:"10:30–11:00", name:"Tostadas con hummus, pavo y fruta + yogur griego",
-        tags:[], desc:"2 rebanadas de pan integral\n1 cda. de hummus\n2 lonchas de fiambre de pavo\nLáminas finas de pera o manzana\n1 yogur griego ligero (125 g)",
-        note:"La fruta dentro del sándwich da dulzor natural. El yogur griego ligero aporta proteína extra sin apenas grasa." },
-      { type:"C", time:"13:30–14:30", name:"Ensalada de quinoa con pollo y patatas",
-        tags:[], desc:"125 g de quinoa cocida (vasito precocido)\n200 g de patatas cocidas troceadas\n120 g de pechuga de pollo en tiras\nTomate cherry + pepino + espinacas al gusto\nAliño: limón + AOVE + especias",
-        note:"La quinoa precocida en vasito está lista en 1 min de microondas. El pollo puede ser sobrante de otro día." },
-      { type:"Me", time:"17:00–17:30", name:"Pan integral con mermelada y plátano",
-        tags:[], desc:"2 rebanadas de pan integral\n2 cdas. de mermelada\n1 plátano en láminas",
-        note:"Merienda hidrocarbonada simple. Ajustar cantidad de mermelada si se quiere reducir azúcar libre." },
-      { type:"Ce", time:"20:30–21:30", name:"Arroz integral con tortilla de atún y ensalada verde",
-        tags:[], desc:"125 g de arroz integral cocido (vasito precocido)\nTortilla de atún: 2 huevos + 1 lata atún al natural\nEnsalada verde: brotes + pepino + remolacha + ¼ aguacate\n1 cda. de AOVE\nProteína pre-cama (opcional)",
-        note:"La tortilla de atún se hace en 5 min. Sustituir por tofu revuelto + atún si se quiere reducir huevo." }
-    ], batchCooking: null
-  },
-  {
-    short: "Jue", full: "Jueves",
-    sport: "⚽ Entrenamiento", sportClass: "fuerza",
-    sportBanner: "Entrenamiento intenso — mayor carga de hidratos en merienda pre-entreno. ~1.980 kcal · ~120 g proteína.",
-    suppl: null, libre: false,
-    meals: [
-      { type:"D", time:"7:00–8:30", name:"Ayuno matutino",
-        tags:[], desc:"Ayuno. Empieza el día con un gran vaso de agua para rehidratarte después de la noche.",
-        note:"Si mañana hay partido, empieza a priorizar la hidratación desde esta mañana. Apunta a 2–2,5 L de agua hoy." },
-      { type:"A", time:"10:30–11:00", name:"Sándwich de mantequilla de cacahuete y plátano",
-        tags:[], desc:"2 rebanadas de pan integral\n½ cdita. por capa de mantequilla de cacahuete natural (sin azúcar)\n1 plátano mediano en láminas dentro del sándwich",
-        note:"Grasa + hidrato + potasio: excelente pre-entreno de media mañana. Asegúrate de que la mantequilla no tenga aceite de palma ni azúcar añadido." },
-      { type:"C", time:"13:30–14:30", name:"Pasta con pollo a la plancha y verduras",
-        tags:[], desc:"80 g de pasta en crudo\n120 g de pollo a la plancha\nVerduras al gusto (calabacín, pimiento, tomate cherry)",
-        note:"Día de mayor acumulación de entrenos. La pasta es el hidrato más eficiente para reponer glucógeno muscular." },
-      { type:"Me", time:"17:00–17:30", name:"Batido + tortitas (o versión sólida)",
-        tags:[], desc:"Opción batido: 250 ml bebida de soja + 30 g de avena + 60 g de frutos rojos congelados\n+ 2 tortitas de arroz con hummus\nOpción sólida: 2 rebanadas pan integral + 1 cda. hummus + 1 huevo duro en láminas + puñado de nueces (≈10 g)",
-        note:"El batido es más rápido y tolera mejor el entrenamiento posterior. La opción sólida es más saciante si el entreno es tarde." },
-      { type:"Ce", time:"20:30–21:30", name:"Patata asada con filete de ternera y ensalada",
-        tags:[], desc:"400 g de patata asada (aprox. 2 patatas medianas)\nFilete de ternera del tamaño de la palma de la mano\nEnsalada verde al gusto\nAliño: 1 cda. AOVE + semillas + especias\nProteína pre-cama (opcional)",
-        note:"La patata es uno de los alimentos más saciantes por kcal. Cocerla o asarla sin añadir grasas extra. El filete puede sustituirse por salmón a la plancha." }
-    ], batchCooking: null
-  },
-  {
-    short: "Pre ⚽", full: "Pre-partido",
-    sport: "⚽ Pre-partido", sportClass: "run",
-    sportBanner: "Día previo al partido — máxima carga de hidratos, grasa controlada, proteína mantenida. ~2.060 kcal · ~110 g proteína.",
-    suppl: null, libre: false,
-    meals: [
-      { type:"D", time:"7:00–8:30", name:"Ayuno matutino",
-        tags:[], desc:"Ayuno. Empieza el día con un gran vaso de agua para rehidratarte.",
-        note:"Hidratación estratégica: apunta a 2–2,5 L de agua a lo largo de todo el día. Evitar exceso de fibra y grasa." },
-      { type:"A", time:"10:30–11:00", name:"Tostadas con hummus, pavo y fruta",
-        tags:[], desc:"2 rebanadas de pan integral\n1 cda. generosa de hummus\n3 lonchas de fiambre de pavo\n2 rodajas de tomate + hojas de lechuga\n1 puñado de uvas o 1 mandarina o 1 naranja",
-        note:"La fruta de fácil digestión aporta fructosa que repone directamente el glucógeno hepático. Masticar despacio." },
-      { type:"C", time:"13:00–14:00", name:"Comida pre-partido (4 h antes del pitido)",
-        tags:[], desc:"100 g de pasta en crudo\n120 g de pollo a la plancha\nEnsalada de pepino y tomate\n1 cda. de AOVE",
-        note:"Respetar las 4 h de margen mínimo antes del partido. No cambiar alimentos ni probar nada nuevo. Comer despacio y masticar bien." },
-      { type:"Me", time:"16:30–17:00", name:"Yogur griego con avena, miel y tortita",
-        tags:[], desc:"1 yogur griego ligero (125 g)\n30 g de avena\n1 cda. de miel\n1 tortita de arroz + 1 cdita. de mermelada",
-        note:"Snack pre-partido moderado. Fácil de digerir. Evitar frutos secos o alimentos muy grasos en este momento." },
-      { type:"Ce", time:"20:30–21:30", name:"Quesadillas con Pollo y boniato asado",
-        tags:[], desc:"Quesadillas con Pollo (ver recetas)\n300 g de boniato asado\n1 fruta",
-        note:"Última cena de carga antes del partido. Mantener porciones dentro de lo habitual. Recuerda preparar el desayuno del día de partido (Porridge de Avena)." }
-    ], batchCooking: null
-  },
-  {
-    short: "Partido ★", full: "Día de partido",
-    sport: "⚽ Partido", sportClass: "crossfit",
-    sportBanner: "Día de partido — máximo rendimiento. Desayuno activador, comida 4 h antes, recuperación post-partido. ~2.300 kcal.",
-    suppl: null, libre: false,
-    meals: [
-      { type:"D", time:"7:30–8:30", name:"Porridge de Avena",
-        tags:[], desc:"Porridge de Avena (ver recetas)\n60 g de copos de avena\n300 ml de bebida de soja\n1 plátano en rodajas\n1 cdita. de miel + canela",
-        note:"Desayuno ideal pre-partido: hidratos lentos + proteína vegetal + sin cocción compleja. Preparar la noche anterior si se prefiere versión cold." },
-      { type:"A", time:"10:30–11:30", name:"Tortitas de arroz con mermelada y fruta",
-        tags:[], desc:"3 tortitas de arroz\n1 cdita. de mermelada por encima de cada una\n1 fruta (plátano a poder ser)",
-        note:"Almuerzo ligero pre-partido. Fácil de digerir, sin exceso de fibra ni grasa. Mantener calma digestiva." },
-      { type:"C", libre:true, time:"Partido − 4 h", name:"Comida pre-partido — libre pero con control",
-        tags:[], desc:"Come lo que te apetezca pero prioriza hidratos + proteína + poca grasa\nOpciones: pasta con pollo, arroz con salmón, bocadillo de pavo\nEvitar: alimentos muy grasos, picantes o nuevos",
-        note:"La comida 4 h antes del partido es la más importante del día. Sin experimentar. Sin excederse en cantidad." },
-      { type:"Me", time:"Post-partido", name:"Recuperación post-partido",
-        tags:[], desc:"2 vasos de zumo natural o 500 ml agua con bebida de recovery\n1 plátano\n2 tortitas de arroz con 1 cda. mantequilla de cacahuete y mermelada\nAlternativa: Galletas de Avena Caseras (ver recetas)",
-        note:"La ventana anabólica de 30–45 min post-partido es crítica. Prioriza hidratos de absorción rápida + algo de proteína. No esperar a llegar a casa." },
-      { type:"Ce", libre:true, time:"20:30–22:00", name:"Cena libre pero con control",
-        tags:[], desc:"Cena sin restricciones pero con consciencia\nPriorizar: hidratos y proteínas para la recuperación muscular\nOpciones: pasta con proteína, arroz con salmón, pizza casera\nEvitar: exceso de alcohol y grasas saturadas",
-        note:"La cena post-partido es herramienta de adherencia y recuperación al mismo tiempo. Come lo que te apetezca priorizando la recuperación." }
-    ], batchCooking: null
-  },
-  {
-    short: "Des", full: "Descanso",
-    sport: "💤 Descanso activo", sportClass: "rest",
-    sportBanner: "Día de recuperación — menos hidratos, proteína mantenida, grasas saludables. ~2.000 kcal.",
-    suppl: null, libre: false,
-    meals: [
-      { type:"D", time:"8:30–9:30", name:"Tortitas de Avena y Plátano",
-        tags:[], desc:"Tortitas de Avena y Plátano (ver recetas)\n60 g de copos de avena\n1 plátano maduro\n1 huevo\nCanela al gusto\nMermelada o fruta fresca para acompañar",
-        note:"El descanso es el único día con desayuno cocinado y con tiempo. Aprovecha para disfrutar del proceso. Puedes hacer más cantidad y guardar." },
-      { type:"A", time:"10:30–11:30", name:"Pan integral con aguacate y huevos revueltos",
-        tags:[], desc:"2 rebanadas de pan integral\n¼ de aguacate en láminas\n2 huevos revueltos",
-        note:"El aguacate aporta grasas saludables y saciedad. Sustituir el huevo por tofu revuelto si se prefiere versión vegetal." },
-      { type:"C", libre:true, time:"13:30–14:30", name:"Comida libre — sin restricciones",
-        tags:[], desc:"Come lo que te apetezca\nSi es posible, mantener base vegetal o proteína de calidad\nEvitar excesos de grasas saturadas y azúcares simples",
-        note:"En día de descanso los hidratos bajan ligeramente. Si es domingo, este es el buen momento para preparar batch cooking o compra semanal." },
-      { type:"Me", time:"17:00–17:30", name:"Tortitas de arroz con mantequilla de cacahuete",
-        tags:[], desc:"2 tortitas de arroz\n1 cda. de mantequilla de cacahuete natural\n1 cdita. de mermelada",
-        note:"Snack ligero sin carga de hidratos grande. En día de descanso no hay necesidad de pre-entreno." },
-      { type:"Ce", libre:true, time:"20:30–22:00", name:"Cena libre",
-        tags:[], desc:"Cena totalmente libre\nOpcional: Crepes de Avena con Ricotta y Espinacas (ver recetas)\nSi hay entrenamiento mañana: añadir 200 g de patata o 125 g de arroz al plato",
-        note:"La cena libre es herramienta de adherencia psicológica. Forma parte del plan. No genera culpa." }
-    ], batchCooking: null
-  }
+const PASS = 'guille2025';
+const CIRC = 2 * Math.PI * 22;
+
+const MENU_FASE1 = [
+  'Verduras de hoja oscura (espinacas, kale, rúcula)',
+  'Legumbres (lentejas, garbanzos, alubias negras)',
+  'Huevos camperos',
+  'Pescado azul (sardinas, caballa, salmón)',
+  'Frutos secos sin sal (nueces, almendras)',
+  'Aceite de oliva virgen extra',
+  'Frutas enteras de temporada'
+];
+const MENU_FASE2 = [
+  'Proteínas magras: pollo, pavo, tofu firme',
+  'Carbohidratos integrales: avena, arroz integral, quinoa',
+  'Grasas saludables: aguacate, semillas de chía',
+  'Lácteos fermentados: yogur natural, kéfir',
+  'Verduras crucíferas: brócoli, coliflor, coles'
+];
+const MENU_FASE3 = [
+  'Combinaciones completas en un plato: proteína + vegetal + carbohidrato integral',
+  'Opciones para comer fuera con criterio',
+  'Snacks de calidad: fruta + frutos secos',
+  'Hidratación: agua, infusiones, caldos caseros',
+  'Tu menú semanal propio (construido por ti)'
 ];
 
-const shopCategories = [
-  {
-    label: "🥩 Proteínas", cls: "cat-prot",
-    items: [
-      { name: "Pechuga de pollo", qty: "600 g" },
-      { name: "Salmón fresco o congelado", qty: "150 g" },
-      { name: "Ternera magra picada", qty: "120 g" },
-      { name: "Filete de ternera o vaca", qty: "1 unidad" },
-      { name: "Garbanzos cocidos (bote)", qty: "1 bote (400 g)" },
-      { name: "Gambas congeladas", qty: "200 g" },
-      { name: "Huevos", qty: "6 unidades" },
-      { name: "Atún al natural (lata)", qty: "2 unidades" },
-      { name: "Fiambre de pavo o pollo (>90%)", qty: "8–10 lonchas" },
-      { name: "Yogur griego ligero", qty: "2 × 125 g" },
-      { name: "Hummus", qty: "1 tarro" },
-      { name: "Queso ricotta o feta", qty: "1 paquete" },
-      { name: "Queso rallado mozzarella o vegano", qty: "1 paquete" }
-    ]
-  },
-  {
-    label: "🌾 Carbohidratos", cls: "cat-carb",
-    items: [
-      { name: "Copos de avena", qty: "500 g" },
-      { name: "Pan integral de molde", qty: "1 paquete" },
-      { name: "Pasta", qty: "500 g" },
-      { name: "Arroz integral (vasito precocido)", qty: "2 × 125 g" },
-      { name: "Quinoa cocida (vasito precocido)", qty: "2 × 125 g" },
-      { name: "Boniato", qty: "600 g (2 medianos)" },
-      { name: "Patata", qty: "2 medianas + 1 bote conserva" },
-      { name: "Tortitas de arroz", qty: "1 paquete" },
-      { name: "Tortillas de avena integral", qty: "1 paquete" },
-      { name: "Mermelada (sabor al gusto)", qty: "1 tarro" },
-      { name: "Frutas variadas (plátanos, manzanas, peras, uvas...)", qty: "11–12 unidades" },
-      { name: "Frutos rojos congelados", qty: "200 g" }
-    ]
-  },
-  {
-    label: "🥑 Grasas", cls: "cat-fat",
-    items: [
-      { name: "Mantequilla de cacahuete (sin azúcar añadido)", qty: "1 tarro" },
-      { name: "AOVE", qty: "uso semanal" },
-      { name: "Mix de semillas", qty: "1 bolsa" },
-      { name: "Aguacate", qty: "1 unidad" },
-      { name: "Frutos secos (nueces, almendras o mix)", qty: "1 bolsa" },
-      { name: "Nata de soja", qty: "200 ml" }
-    ]
-  },
-  {
-    label: "🧂 Extras", cls: "cat-extra",
-    items: [
-      { name: "Cacao puro en polvo", qty: "1 bote" },
-      { name: "Miel", qty: "1 tarro" },
-      { name: "Salsa de tomate casera o tomate triturado", qty: "1 lata" },
-      { name: "Zumo concentrado de frutas (recovery)", qty: "1 botella" },
-      { name: "Bebida de soja", qty: "1,5 L" },
-      { name: "Verduras: tomate, pepino, cebolla, brotes, brócoli, espárragos, remolacha", qty: "semana completa" },
-      { name: "Especias: curry, canela, pimentón, comino, ajo en polvo", qty: "al gusto" }
-    ]
-  }
+const WEEKS = [
+  {p:1,t:'¿Dónde estás ahora?',
+   pildora:'El punto de partida real es el más honesto. Esta semana observamos sin cambiar nada: qué comes, cuándo, y por qué. Sin juicios, solo información.',
+   reto:'Registra tu alimentación durante 3 días tal y como la haces habitualmente. No cambies nada. Queremos datos reales, no datos perfectos.',
+   checks:['He registrado al menos 3 días de alimentación habitual','He identificado mis horarios de comida habituales','He anotado momentos donde como sin tener hambre real']},
+  {p:1,t:'Cómo funciona la energía',
+   pildora:'Los macronutrientes no son buenos ni malos: son herramientas. La proteína construye y repara. Los carbohidratos son energía de calidad. Las grasas regulan hormonas y protegen órganos. Necesitas los tres.',
+   reto:'Elige 5 comidas de tu semana y trata de identificar qué macronutriente predomina en cada una. Sin pesar ni calcular: es un ejercicio de reconocimiento.',
+   checks:['Sé distinguir proteínas, carbohidratos y grasas en comidas reales','He identificado qué macronutriente me falta habitualmente','He añadido los primeros alimentos al menú base']},
+  {p:1,t:'Los mejores alimentos según la ciencia',
+   pildora:'Hay alimentos con un retorno nutricional excepcional: te dan más por menos. Esta semana conoces cuáles son, por qué la ciencia los respalda, y los incorporas al menú de forma natural.',
+   reto:'Incorpora 2 alimentos de la lista base que no forman parte de tu rutina habitual. Elige los que más te apetezca probar.',
+   checks:['He probado al menos 1 alimento nuevo de la lista base','Entiendo por qué esos alimentos tienen alta densidad nutricional','Mi menú base tiene ya una primera versión real']},
+  {p:1,t:'Hambre, saciedad y señales reales',
+   pildora:'El conocimiento nutricional no es suficiente si no entendemos cuándo y por qué comemos. El hambre emocional, el entorno y el estrés condicionan nuestras decisiones más de lo que creemos.',
+   reto:'Antes de cada comida principal esta semana, pregúntate: ¿tengo hambre física o hay algo más? Anota 3 momentos en los que lo identifies claramente. Solo observar, sin cambiar nada.',
+   checks:['Distingo hambre fisiológica de hambre emocional en mi día a día','He identificado al menos 2 situaciones de hambre emocional esta semana','Cierro el primer mes con un menú base funcionando']},
+  {p:2,t:'Proteína: la gran incomprendida',
+   pildora:'Más proteína no siempre es mejor, pero casi todos comemos menos de la necesaria. Aprenderás cuánta necesitas según tu estilo de vida, cuándo distribuirla, y cuáles son las mejores fuentes sin complicarte la vida.',
+   reto:'Rediseña una de tus comidas habituales para optimizar su aporte de proteína sin aumentar el presupuesto ni complicar la preparación.',
+   checks:['Sé cuánta proteína necesito aproximadamente cada día','He redistribuido la proteína a lo largo del día','Mi menú de esta fase incorpora fuentes de proteína variadas']},
+  {p:2,t:'Carbohidratos sin miedo',
+   pildora:'No todos los carbohidratos son iguales. El índice glucémico, la carga glucémica y la fibra explican por qué la avena y el pan blanco no son lo mismo, aunque los dos sean "carbohidratos".',
+   reto:'Sustituye 2 fuentes de carbohidrato refinado por su versión integral durante esta semana. Anota si notas alguna diferencia en saciedad o energía.',
+   checks:['Entiendo la diferencia entre carbohidratos simples y complejos','He realizado las 2 sustituciones del reto','Sé elegir mejor la fuente de carbohidratos según el momento del día']},
+  {p:2,t:'Grasas, inflamación y longevidad',
+   pildora:'Las grasas tienen mala fama heredada de los años 80. La evidencia actual es clara: las grasas correctas protegen el corazón, el cerebro y reducen la inflamación. Las incorrectas hacen lo opuesto.',
+   reto:'Audita las grasas de tu despensa en 10 minutos: etiquetas, aceites, snacks. Identifica cuáles quieres mantener y cuáles cambiarías.',
+   checks:['Distingo grasas saludables de inflamatorias en etiquetas','He hecho la auditoría de la despensa','Entiendo el papel del Omega 3 en la alimentación diaria']},
+  {p:2,t:'Construye tu menú semanal',
+   pildora:'Todo lo aprendido este mes se traduce ahora en un menú real. Tú propones, ajustamos juntos, y entiendes el porqué de cada decisión. Al final de esta sesión tienes un menú de 5 días que has construido tú.',
+   reto:'Construye un menú completo de 5 días por tu cuenta antes de la próxima sesión. Usa lo aprendido hasta ahora.',
+   checks:['He construido un menú de 5 días de forma autónoma','El menú equilibra los 3 macronutrientes de forma consciente','Entiendo por qué tomé cada decisión en el menú']},
+  {p:3,t:'Nutrición en el mundo real',
+   pildora:'Saber comer bien en casa no es suficiente. La vida ocurre: cenas con amigos, viajes, restaurantes, eventos. Esta semana aprendes a mantener el criterio sin obsesionarte ni renunciar a nada.',
+   reto:'Come fuera de casa 2 veces esta semana con criterio. Antes de pedir, tómate 30 segundos para elegir con lo que sabes. Luego anota cómo lo resolviste.',
+   checks:['He comido fuera 2 veces con criterio nutricional consciente','Sé cómo navegar un menú de restaurante con lo aprendido','No siento que comer fuera me saque del programa']},
+  {p:3,t:'Leer etiquetas y no morir en el intento',
+   pildora:'Las etiquetas nutricionales están diseñadas para confundir. El orden de ingredientes, los azúcares ocultos y los claims engañosos son herramientas de marketing. Esta semana aprendes a leerlos como lo haría un profesional.',
+   reto:'Elige 3 pares de productos del supermercado (mismo tipo, marcas distintas) y compáralos con el criterio aprendido esta semana. ¿Cuál elegirías ahora?',
+   checks:['Entiendo cómo leer una etiqueta nutricional de forma crítica','He comparado al menos 3 productos aplicando el criterio','Identifico azúcares ocultos y claims nutricionales engañosos']},
+  {p:3,t:'Tu cuerpo a largo plazo',
+   pildora:'Lo que comes hoy impacta en cómo estarás en 20 años. Microbiota, inflamación crónica, sueño y longevidad están directamente conectados con la alimentación. Esta semana la ciencia del largo plazo.',
+   reto:'Incorpora 3 hábitos de longevidad durante esta semana: uno relacionado con la microbiota, uno con el sueño y uno con la inflamación. Evalúa al final cómo te han ido.',
+   checks:['Entiendo la conexión entre alimentación y longevidad','He incorporado los 3 hábitos del reto esta semana','Tengo claro qué cambios quiero mantener para siempre']},
+  {p:3,t:'Cierre y entrega de autonomía',
+   pildora:'Este es el momento en que el programa termina y tu autonomía nutricional empieza. Revisamos el camino recorrido, presentas tu protocolo personal, y te llevas las herramientas para el resto de tu vida.',
+   reto:'Tu entrega final: un documento con tus principios nutricionales, tu menú base, tus estrategias para el mundo real y los hábitos que has decidido mantener. Es tuyo para siempre.',
+   checks:['He presentado mi protocolo nutricional personal','Puedo gestionar mi alimentación sin necesitar una pauta externa','Soy consciente del camino recorrido estos 3 meses']}
 ];
 
-const recetas = [
-  {
-    emoji: "🥣", nombre: "Porridge de Avena",
-    tiempo: "⏱ 5 min", raciones: "🍽 1 persona", utensilios: "🔥 Cazo o microondas",
-    ingredientes: ["60 g copos de avena", "300 ml bebida de soja (o leche semidesnatada)", "1 plátano maduro en rodajas", "1 cdita. de miel", "Canela al gusto"],
-    pasos: [
-      "Calentar la bebida de soja en un cazo a fuego medio.",
-      "Añadir los copos de avena y remover continuamente 3–4 min hasta la textura deseada.",
-      "Servir en bol con el plátano en rodajas, la miel y la canela.",
-      "Alternativa microondas: mezclar avena + bebida en bol apto, 2 min, remover, 1 min más."
-    ],
-    tip: "💡 Cold porridge: mezclar avena + bebida la noche anterior y dejar en nevera. Listo para comer frío al día siguiente. Añadir cacao puro en polvo para un toque extra."
-  },
-  {
-    emoji: "🥞", nombre: "Tortitas de Avena y Plátano",
-    tiempo: "⏱ 10 min", raciones: "🍽 1 persona (6–8 tortitas)", utensilios: "🔥 Sartén antiadherente",
-    ingredientes: ["60 g copos de avena (o harina de avena)", "1 plátano maduro", "1 huevo", "Canela al gusto", "Spray de aceite o AOVE"],
-    pasos: [
-      "Triturar o aplastar el plátano con tenedor hasta obtener puré.",
-      "Mezclar con la avena, el huevo y la canela hasta masa homogénea.",
-      "Calentar la sartén a fuego medio con spray de aceite.",
-      "Verter pequeñas porciones y cocinar 2–3 min por cada lado hasta que estén doradas."
-    ],
-    tip: "💡 Servir con mermelada sin azúcar, fruta fresca o miel. La masa aguanta en nevera hasta 24 h."
-  },
-  {
-    emoji: "🍛", nombre: "Curry de Garbanzos",
-    tiempo: "⏱ 20 min", raciones: "🍽 2 personas", utensilios: "🔥 Sartén o cazuela",
-    ingredientes: ["1 bote garbanzos cocidos (400 g escurridos)", "1 cebolla mediana", "2 dientes de ajo", "1 lata tomate triturado (400 g)", "200 ml nata de soja", "Curry, comino, cúrcuma al gusto", "1 cda. AOVE"],
-    pasos: [
-      "Sofreír la cebolla y el ajo picados en AOVE durante 5 min a fuego medio.",
-      "Añadir las especias (curry, comino, cúrcuma) y remover 1 min para tostarlas.",
-      "Incorporar el tomate triturado y cocinar 5 min.",
-      "Añadir los garbanzos escurridos y la nata de soja. Cocinar a fuego lento 10 min."
-    ],
-    tip: "💡 Hacer el doble y guardar en nevera hasta 3 días. Acompañar con arroz integral para mayor carga de hidratos."
-  },
-  {
-    emoji: "🌮", nombre: "Quesadillas con Pollo",
-    tiempo: "⏱ 15 min", raciones: "🍽 1 persona", utensilios: "🔥 Sartén antiadherente",
-    ingredientes: ["2 tortillas de avena integral", "120 g pechuga de pollo a la plancha (desmenuzada)", "½ pimiento rojo o verde", "½ cebolla", "Queso rallado mozzarella o vegano al gusto", "Pimentón y ajo en polvo al gusto"],
-    pasos: [
-      "Saltear el pimiento y la cebolla en tiras a fuego medio durante 5 min.",
-      "Calentar la tortilla en sartén a fuego medio.",
-      "Distribuir el pollo, las verduras salteadas y el queso sobre media tortilla.",
-      "Doblar y cocinar 2 min por cada lado hasta que el queso se funda."
-    ],
-    tip: "💡 Servir con yogur griego ligero como sustituto de crema agria o con ½ aguacate aplastado."
-  },
-  {
-    emoji: "🍪", nombre: "Galletas de Avena Caseras",
-    tiempo: "⏱ 20 min", raciones: "🍽 8–10 galletas", utensilios: "🔥 Horno 180°C",
-    ingredientes: ["80 g copos de avena", "1 plátano muy maduro", "1 cda. mantequilla de cacahuete", "Canela al gusto", "Chips de chocolate negro 85% (opcional)"],
-    pasos: [
-      "Precalentar el horno a 180°C.",
-      "Aplastar el plátano con tenedor hasta obtener puré.",
-      "Mezclar con la avena, la mantequilla de cacahuete y la canela.",
-      "Formar porciones pequeñas y aplanarlas sobre papel de horno.",
-      "Hornear 12–15 min hasta que estén doradas por los bordes."
-    ],
-    tip: "💡 Guardar en recipiente hermético hasta 3 días. Ideales como snack post-partido por su ratio hidratos:proteína."
-  },
-  {
-    emoji: "🥗", nombre: "Crepes de Avena con Ricotta y Espinacas",
-    tiempo: "⏱ 20 min", raciones: "🍽 2 crepes", utensilios: "🔥 Sartén antiadherente",
-    ingredientes: ["60 g harina de avena (o copos triturados)", "1 huevo", "150 ml bebida de soja", "100 g espinacas frescas", "80 g queso ricotta", "Sal, pimienta y nuez moscada al gusto"],
-    pasos: [
-      "Mezclar harina de avena + huevo + bebida de soja hasta masa lisa. Reposar 5 min.",
-      "Cocinar las crepes en sartén antiadherente a fuego medio-alto, 1–2 min por lado.",
-      "Saltear las espinacas 2 min con sal y pimienta.",
-      "Mezclar las espinacas con la ricotta y rellenar las crepes."
-    ],
-    tip: "💡 Si hay entrenamiento mañana, añadir 125 g de arroz cocido o 200 g de patata cocida al relleno."
-  }
-];
+function phaseColor(p){return p===1?'#1D9E75':p===2?'#534AB7':'#BA7517'}
+function phaseLabel(p){return p===1?'Fase 1 · Diagnóstico y base':p===2?'Fase 2 · Cambio activo':'Fase 3 · Consolidación y autonomía'}
+function phaseRange(p){return p===1?'Semanas 1–4':p===2?'Semanas 5–8':'Semanas 9–12'}
+function menuForPhase(p){return p===1?MENU_FASE1:p===2?MENU_FASE2:MENU_FASE3}
 
-function badgeClass(type, libre) {
-  if (libre) return "badge-libre";
-  const map = { D:"badge-d", A:"badge-a", Me:"badge-me", C:"badge-c", Ce:"badge-ce" };
-  return map[type] || "badge-c";
+let S = {unlocked:0, checks:{}, admin:false};
+const SK = 'metodo3m_v2';
+
+function loadState(){
+  try{const d=localStorage.getItem(SK);if(d)S={...S,...JSON.parse(d)}}catch(e){}
 }
-function badgeLabel(type, libre) {
-  if (libre) return "Libre";
-  const map = { D:"Desayuno", A:"Almuerzo", Me:"Merienda", C:"Comida", Ce:"Cena" };
-  return map[type] || type;
+function saveState(){
+  try{localStorage.setItem(SK,JSON.stringify(S))}catch(e){}
 }
 
-let current = 0;
+let currentView = 'inicio';
 
-function render() {
-  const d = days[current];
-  let html = `<div style="font-size:18px;font-weight:500;color:#111;margin-bottom:8px">${d.full}</div>`;
-  html += `<div class="pn-sport-banner ${d.sportClass}">${d.sport} — ${d.sportBanner}</div>`;
-  if (d.libre) html += `<div class="pn-libre-banner">La cena de este día está reservada como comida libre (10%). El resto del día mantiene la base habitual.</div>`;
-  if (d.suppl) html += `<div class="pn-supp-banner">` + d.suppl.replace(/\n/g,"<br>") + `</div>`;
-  if (d.batchCooking) {
-    const bc = d.batchCooking;
-    const items = bc.items.map(i => `<li>${i}</li>`).join("");
-    html += `<div class="pn-batch-section"><h3>${bc.title}</h3><ul>${items}</ul><div class="bc-note">⏱ ${bc.note}</div></div>`;
+function switchTab(v){
+  currentView = v;
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  if(v==='inicio'){
+    renderInicio();
+    document.querySelectorAll('.nav-tab')[0].classList.add('active');
+  } else if(v==='semanas'){
+    renderSemanas();
+    document.querySelectorAll('.nav-tab')[1].classList.add('active');
   }
-  html += `<div class="pn-meals">`;
-  d.meals.forEach(m => {
-    const bc = badgeClass(m.type, m.libre);
-    const bl = badgeLabel(m.type, m.libre);
-    let tagsHtml = "";
-    if (m.tags && m.tags.includes("extra")) tagsHtml += `<span class="pn-extra-tag">🥡 Hacer cantidad extra</span> `;
-    if (m.tags && m.tags.includes("batch")) tagsHtml += `<span class="pn-batch-tag">♻️ Usar del batch cooking</span> `;
-    const rawParts = m.desc.split(/\n/).map(s => s.trim()).filter(s => s.length > 0);
-    let ingsHtml = `<span class="pn-ing">${rawParts.join(" + ")}</span>`;
-    html += `
-      <div class="pn-card">
-        <div class="pn-meal-header">
-          <span class="pn-badge ${bc}">${bl}</span>
-          <span class="pn-time">${m.time}</span>
+}
+
+function openDetalle(i){
+  renderDetalle(i);
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-detalle').classList.add('active');
+}
+
+/* ── RENDER INICIO ── */
+function renderInicio(){
+  const activeIdx = S.unlocked; // 0-based index of current week
+  const w = WEEKS[Math.min(activeIdx, 11)];
+  const wNum = Math.min(activeIdx + 1, 12);
+  const pct = Math.min(Math.round((S.unlocked / 12) * 100), 100);
+  const offset = CIRC - (pct / 100) * CIRC;
+  const phase = w.p;
+
+  // Hero
+  document.getElementById('heroBlock').innerHTML = `
+    <p class="hero-eyebrow">Tu programa activo</p>
+    <p class="hero-week">Semana ${wNum} de 12</p>
+    <p class="hero-sub">${w.t}</p>
+    <div class="hero-progress">
+      <div class="ring-wrap">
+        <svg width="52" height="52" viewBox="0 0 52 52">
+          <circle class="ring-bg" cx="26" cy="26" r="22"/>
+          <circle class="ring-fill" cx="26" cy="26" r="22"
+            stroke-dasharray="${CIRC}" stroke-dashoffset="${offset}"/>
+        </svg>
+        <div class="ring-label">${pct}%</div>
+      </div>
+      <div class="progress-text">
+        <strong>${S.unlocked} semana${S.unlocked===1?'':'s'} completada${S.unlocked===1?'':'s'}</strong>
+        ${12 - S.unlocked} semanas restantes
+      </div>
+    </div>`;
+
+  // Reto
+  document.getElementById('retoSection').innerHTML = `
+    <p class="section-label">Tu reto esta semana</p>
+    <div class="card reto-card">
+      <div class="reto-header">
+        <div class="reto-tag">
+          <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          Reto activo
         </div>
-        ${tagsHtml ? `<div style="margin-bottom:6px">${tagsHtml}</div>` : ""}
-        <div class="pn-name">${m.name}</div>
-        <div class="pn-ing-list">${ingsHtml}</div>
-        <div class="pn-note">Adaptación: ${m.note}</div>
-      </div>`;
-  });
-  html += `</div>`;
-  document.getElementById("dayView").innerHTML = html;
+        <p class="reto-title">${w.t}</p>
+      </div>
+      <div class="reto-body">
+        <p class="reto-text">${w.reto}</p>
+      </div>
+    </div>`;
+
+  // Píldora
+  document.getElementById('pildoraSection').innerHTML = `
+    <p class="section-label">Lo que aprendes esta semana</p>
+    <div class="card pildora-card">
+      <div class="card-header">
+        <div class="card-icon teal">
+          <svg fill="none" stroke="#0F6E56" stroke-width="2" viewBox="0 0 24 24" width="18" height="18">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <p class="card-tag">${phaseLabel(phase)}</p>
+          <p class="card-title">${w.t}</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <p class="card-text">${w.pildora}</p>
+      </div>
+    </div>`;
+
+  // Menú de fase
+  const menu = menuForPhase(phase);
+  const badgeColor = phase===1?'#E1F5EE':phase===2?'#EEEDFE':'#FAEEDA';
+  const badgeText = phase===1?'#085041':phase===2?'#3C3489':'#633806';
+  document.getElementById('menuSection').innerHTML = `
+    <p class="section-label">Tu menú de referencia · ${phaseLabel(phase)}</p>
+    <div class="card">
+      <div class="card-body" style="padding-top:1.25rem">
+        <span class="menu-phase-badge" style="background:${badgeColor};color:${badgeText}">${phaseLabel(phase)}</span>
+        <div class="menu-items">
+          ${menu.map(m=>`<div class="menu-item"><div class="menu-dot"></div><span>${m}</span></div>`).join('')}
+        </div>
+      </div>
+    </div>`;
 }
 
-function buildTabs() {
-  const container = document.getElementById("dayTabs");
-  days.forEach((d, i) => {
-    const btn = document.createElement("button");
-    btn.className = "pn-day-btn" + (i === 0 ? " active" : "");
-    btn.textContent = d.short;
-    btn.onclick = () => {
-      document.querySelectorAll(".pn-day-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      current = i;
-      render();
-    };
-    container.appendChild(btn);
-  });
-}
-
-let shopCurrent = 0;
-
-function renderShop() {
-  const cat = shopCategories[shopCurrent];
-  let html = '<div class="pn-shop-list">';
-  cat.items.forEach(item => {
-    html += `<div class="pn-shop-item ${cat.cls}" onclick="this.classList.toggle('done')">
-      <div class="pn-shop-item-name">${item.name}</div>
-      <div class="pn-shop-item-qty">${item.qty}</div>
+/* ── RENDER SEMANAS ── */
+function renderSemanas(){
+  let html = '';
+  let curPhase = 0;
+  WEEKS.forEach((w,i)=>{
+    const wNum = i+1;
+    const isDone = wNum <= S.unlocked;
+    const isActive = wNum === S.unlocked + 1;
+    const isLocked = wNum > S.unlocked + 1;
+    if(w.p !== curPhase){
+      if(curPhase) html += '</div>';
+      curPhase = w.p;
+      html += `<div class="phase-block">
+        <div class="phase-label-row">
+          <div class="phase-pip" style="background:${phaseColor(w.p)}"></div>
+          <span class="phase-name">${phaseLabel(w.p)}</span>
+          <span class="phase-range">${phaseRange(w.p)}</span>
+        </div>`;
+    }
+    const numCls = isDone?'done':isActive?'act':'lock';
+    const numContent = isDone?'✓':wNum;
+    const rowCls = isLocked?'week-row locked':isActive?'week-row wactive':'week-row';
+    const sub = isDone?'Completada':isActive?'Semana activa':'Bloqueada';
+    html += `<div class="${rowCls}" onclick="openDetalle(${i})">
+      <div class="wrow-num ${numCls}">${numContent}</div>
+      <div class="wrow-info">
+        <div class="wrow-title">${w.t}</div>
+        <div class="wrow-sub">Semana ${wNum} · ${sub}</div>
+      </div>
+      ${isDone?'<span class="wrow-check">✓</span>':'<svg class="wrow-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>'}
     </div>`;
   });
   html += '</div>';
-  document.getElementById("shopView").innerHTML = html;
+  document.getElementById('weeksList').innerHTML = html;
 }
 
-function buildShopTabs() {
-  const container = document.getElementById("shopTabs");
-  shopCategories.forEach((cat, i) => {
-    const btn = document.createElement("button");
-    btn.className = "pn-shop-btn " + cat.cls + (i === 0 ? " active" : "");
-    btn.textContent = cat.label;
-    btn.onclick = () => {
-      document.querySelectorAll(".pn-shop-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      shopCurrent = i;
-      renderShop();
-    };
-    container.appendChild(btn);
-  });
-}
+/* ── RENDER DETALLE ── */
+function renderDetalle(i){
+  const w = WEEKS[i];
+  const wNum = i+1;
+  const isDone = wNum <= S.unlocked;
+  const isActive = wNum === S.unlocked + 1;
+  const checks = S.checks['w'+wNum] || {};
 
-function buildRecetas() {
-  if (typeof recetas === "undefined" || !recetas.length) return;
-  const container = document.getElementById("recetasList");
-  if (!container) return;
-  recetas.forEach((r, i) => {
-    const div = document.createElement("div");
-    div.className = "pn-receta";
-    div.innerHTML = `
-      <div class="pn-receta-header" onclick="toggleReceta(${i})">
-        <div class="pn-receta-title">${r.emoji} ${r.nombre}</div>
-        <span class="pn-receta-arrow">▸</span>
-      </div>
-      <div class="pn-receta-body">
-        <div class="pn-receta-meta">
-          <span class="pn-receta-meta-pill">${r.tiempo}</span>
-          <span class="pn-receta-meta-pill">${r.raciones}</span>
-          <span class="pn-receta-meta-pill">${r.utensilios}</span>
-        </div>
-        <div class="pn-receta-section">🧺 Ingredientes</div>
-        <div class="pn-receta-ings">${r.ingredientes.map(ing => `<span class="pn-receta-ing">${ing}</span>`).join("")}</div>
-        <div class="pn-receta-section">👨‍🍳 Elaboración</div>
-        <ol class="pn-receta-steps">${r.pasos.map((p,n) => `<li class="pn-receta-step"><span class="pn-receta-step-num">${n+1}</span><span>${p}</span></li>`).join("")}</ol>
-        <div class="pn-receta-tip">${r.tip}</div>
+  let html = `
+    <div class="detail-hero">
+      <p class="detail-eyebrow">Semana ${wNum} · ${phaseLabel(w.p)}</p>
+      <p class="detail-title">${w.t}</p>
+    </div>
+    <div class="detail-reto">
+      <p class="detail-reto-tag">Reto de la semana</p>
+      <p class="detail-reto-text">${w.reto}</p>
+    </div>
+    <div class="detail-section">
+      <p class="detail-section-label">Lo que aprendes</p>
+      <p class="detail-text">${w.pildora}</p>
+    </div>`;
+
+  if(isDone || isActive){
+    html += `<div class="detail-section" style="margin-top:0.5rem">
+      <p class="detail-section-label">Tu progreso esta semana</p>
+    </div>
+    <div class="check-list">`;
+    w.checks.forEach((c,ci)=>{
+      const on = checks[ci];
+      html += `<div class="check-item" onclick="toggleCheck(${i},${ci})">
+        <div class="chk-box${on?' on':''}" id="cb-${i}-${ci}"></div>
+        <span class="chk-label${on?' done':''}" id="cl-${i}-${ci}">${c}</span>
       </div>`;
-    container.appendChild(div);
-  });
+    });
+    html += '</div>';
+  }
+
+  document.getElementById('detalleContent').innerHTML = html;
 }
 
-function toggleReceta(i) {
-  document.querySelectorAll(".pn-receta")[i].classList.toggle("open");
+function toggleCheck(wi, ci){
+  const key = 'w'+(wi+1);
+  if(!S.checks[key]) S.checks[key]={};
+  S.checks[key][ci] = !S.checks[key][ci];
+  saveState();
+  const box = document.getElementById(`cb-${wi}-${ci}`);
+  const lbl = document.getElementById(`cl-${wi}-${ci}`);
+  if(box) box.className = 'chk-box'+(S.checks[key][ci]?' on':'');
+  if(lbl) lbl.className = 'chk-label'+(S.checks[key][ci]?' done':'');
 }
 
-buildTabs();
-render();
-buildShopTabs();
-renderShop();
-buildRecetas();
+/* ── ADMIN ── */
+function showAdminOverlay(){
+  if(S.admin) return;
+  document.getElementById('adminOverlay').style.display='flex';
+  setTimeout(()=>document.getElementById('adminPass').focus(),100);
+}
+function closeAdminOverlay(){
+  document.getElementById('adminOverlay').style.display='none';
+  document.getElementById('adminPass').value='';
+  document.getElementById('loginErr').textContent='';
+}
+function checkAdmin(){
+  const v = document.getElementById('adminPass').value;
+  if(v===PASS){
+    S.admin=true;
+    closeAdminOverlay();
+    document.getElementById('adminPanel').style.display='flex';
+    document.getElementById('accessBtn').style.display='none';
+    populateAdminSel();
+  } else {
+    document.getElementById('loginErr').textContent='Contraseña incorrecta';
+    setTimeout(()=>document.getElementById('loginErr').textContent='',2000);
+  }
+}
+function exitAdmin(){
+  S.admin=false;
+  document.getElementById('adminPanel').style.display='none';
+  document.getElementById('accessBtn').style.display='flex';
+}
+function populateAdminSel(){
+  const sel = document.getElementById('adminSel');
+  sel.innerHTML='';
+  for(let i=1;i<=12;i++){
+    const o=document.createElement('option');
+    o.value=i;
+    o.textContent=`Semana ${i}${i<=S.unlocked?' ✓':''}`;
+    sel.appendChild(o);
+  }
+  sel.value=Math.min(S.unlocked+1,12);
+}
+function doUnlock(){
+  const v=parseInt(document.getElementById('adminSel').value);
+  S.unlocked=v;
+  saveState();
+  populateAdminSel();
+  if(currentView==='inicio') renderInicio();
+  else if(currentView==='semanas') renderSemanas();
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&document.getElementById('adminOverlay').style.display==='flex') checkAdmin();
+  if(e.key==='Escape'&&document.getElementById('adminOverlay').style.display==='flex') closeAdminOverlay();
+});
+
+/* ── BOOT ── */
+loadState();
+setTimeout(()=>{
+  document.getElementById('view-loading').style.display='none';
+  document.getElementById('app').style.display='block';
+  renderInicio();
+}, 600);
 </script>
-
 </body>
 </html>
